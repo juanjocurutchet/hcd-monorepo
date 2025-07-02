@@ -117,16 +117,27 @@ export async function updateSession(session: {
     let minutesFileUrl = currentData.minutes_file_url || null
     let audioFileUrl = currentData.audio_file_url || null
 
+    // Obtener fecha en formato YYYY-MM-DD
+    const fechaStr = session.date instanceof Date
+      ? session.date.toISOString().split('T')[0]
+      : String(session.date).split('T')[0];
+
     if (session.agendaFile && session.agendaFile.size > 0) {
-      agendaFileUrl = await uploadFile(session.agendaFile, "sesiones")
+      const ext = session.agendaFile.name.split('.').pop();
+      const publicId = `sesiones/acta-${fechaStr}.${ext}`;
+      agendaFileUrl = await uploadFile(session.agendaFile, "sesiones", publicId);
     }
 
     if (session.minutesFile && session.minutesFile.size > 0) {
-      minutesFileUrl = await uploadFile(session.minutesFile, "sesiones")
+      const ext = session.minutesFile.name.split('.').pop();
+      const publicId = `sesiones/orden_del_dia-${fechaStr}.${ext}`;
+      minutesFileUrl = await uploadFile(session.minutesFile, "sesiones", publicId);
     }
 
     if (session.audioFile && session.audioFile.size > 0) {
-      audioFileUrl = await uploadFile(session.audioFile, "sesiones")
+      const ext = session.audioFile.name.split('.').pop();
+      const publicId = `sesiones/audio_sesion-${fechaStr}.${ext}`;
+      audioFileUrl = await uploadFile(session.audioFile, "sesiones", publicId);
     }
 
     const updated = await sql`
@@ -178,17 +189,28 @@ export async function createSession(session: {
     let minutesFileUrl = null
     let audioFileUrl = null
 
-    // Subir archivos si existen
+    // Obtener fecha en formato YYYY-MM-DD
+    const fechaStr = session.date instanceof Date
+      ? session.date.toISOString().split('T')[0]
+      : String(session.date).split('T')[0];
+
+    // Subir archivos si existen, con nombre personalizado
     if (session.agendaFile && session.agendaFile.size > 0) {
-      agendaFileUrl = await uploadFile(session.agendaFile, "sesiones")
+      const ext = session.agendaFile.name.split('.').pop();
+      const publicId = `sesiones/acta-${fechaStr}.${ext}`;
+      agendaFileUrl = await uploadFile(session.agendaFile, "sesiones", publicId);
     }
 
     if (session.minutesFile && session.minutesFile.size > 0) {
-      minutesFileUrl = await uploadFile(session.minutesFile, "sesiones")
+      const ext = session.minutesFile.name.split('.').pop();
+      const publicId = `sesiones/orden_del_dia-${fechaStr}.${ext}`;
+      minutesFileUrl = await uploadFile(session.minutesFile, "sesiones", publicId);
     }
 
     if (session.audioFile && session.audioFile.size > 0) {
-      audioFileUrl = await uploadFile(session.audioFile, "sesiones")
+      const ext = session.audioFile.name.split('.').pop();
+      const publicId = `sesiones/audio_sesion-${fechaStr}.${ext}`;
+      audioFileUrl = await uploadFile(session.audioFile, "sesiones", publicId);
     }
 
     const result = await sql`
