@@ -1,0 +1,1 @@
+ALTER TABLE "commission_files" ADD COLUMN "file_url" varchar(255);

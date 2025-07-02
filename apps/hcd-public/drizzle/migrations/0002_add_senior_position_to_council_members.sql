@@ -1,0 +1,1 @@
+ALTER TABLE council_members ADD COLUMN senior_position varchar(255);

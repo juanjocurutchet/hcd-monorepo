@@ -1,0 +1,1 @@
+ALTER TABLE ordinances ADD COLUMN derogada_por integer;
