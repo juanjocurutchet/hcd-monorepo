@@ -9,7 +9,7 @@ export default function NuevoUsuarioPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <UsuarioForm />
+        <UsuarioForm usuario={null} key={Date.now()} />
       </div>
     </div>
   )

@@ -1,9 +1,20 @@
+export const dynamic = "force-dynamic";
 
-import { getAllUsers } from "@/lib/services/user-service"
-import Link from "next/link"
+import nextDynamic from "next/dynamic";
+import Link from "next/link";
+
+const UsuariosTableClient = nextDynamic(() => import("./UsuariosTableClient"), { ssr: false });
+
+const ROLES = [
+  { value: "SUPERADMIN", label: "Superadmin" },
+  { value: "ADMIN", label: "Administrador" },
+  { value: "EDITOR", label: "Editor" },
+  { value: "USER", label: "Usuario" },
+  { value: "BLOQUE", label: "Bloque" },
+];
 
 export default async function UsuariosPage() {
-  const usuarios = await getAllUsers()
+  // const usuarios = await getAllUsers(); // Ya no se usa
 
   return (
     <div className="space-y-6">
@@ -13,20 +24,7 @@ export default async function UsuariosPage() {
           Agregar usuario
         </Link>
       </div>
-
-      <ul className="divide-y divide-gray-200 border rounded-md">
-        {usuarios.map((user) => (
-          <li key={user.id} className="p-4">
-            <Link
-              href={`/admin-panel/usuarios/${user.id}`}
-              className="font-medium text-lg text-blue-700 hover:underline"
-            >
-              {user.name}
-            </Link>
-            <p className="text-sm text-gray-500">{user.email} — Rol: {user.role}</p>
-          </li>
-        ))}
-      </ul>
+      <UsuariosTableClient />
     </div>
-  )
+  );
 }

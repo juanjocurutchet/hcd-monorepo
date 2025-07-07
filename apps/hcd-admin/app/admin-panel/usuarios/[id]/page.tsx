@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 
-import { UsuarioForm } from "../components/usuario-form"
 import { getUserById } from "@/lib/services/user-service"
+import { UsuarioForm } from "../components/usuario-form"
 
 interface PageProps {
   params: {
