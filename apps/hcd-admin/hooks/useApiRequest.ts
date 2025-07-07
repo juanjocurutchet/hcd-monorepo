@@ -8,8 +8,6 @@ export function useApiRequest() {
       throw new Error("No hay sesión activa")
     }
 
-    console.log("🔍 API Request:", { url, method: options.method }) // Debug
-
     const isFormData = options.body instanceof FormData
     const defaultHeaders = {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
@@ -21,8 +19,6 @@ export function useApiRequest() {
       credentials: 'include',
       headers: defaultHeaders
     })
-
-    console.log("🔍 API Response:", { status: response.status, url }) // Debug
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))

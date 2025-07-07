@@ -24,7 +24,7 @@ export default function UsuariosTableClient() {
   async function fetchUsuarios() {
     setLoading(true)
     try {
-      const res = await fetch("/api/users")
+      const res = await fetch("/api/users", { cache: "no-store" })
       const data = await res.json()
       setUsuarios(data)
     } catch {

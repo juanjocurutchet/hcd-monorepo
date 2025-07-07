@@ -61,6 +61,7 @@ export const committees = pgTable("committees", {
   description: text("description"),
   presidentId: integer("president_id").references(() => councilMembers.id),
   secretaryId: integer("secretary_id").references(() => councilMembers.id),
+  secretaryHcdId: integer("secretary_hcd_id").references(() => staff.id),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

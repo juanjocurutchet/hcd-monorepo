@@ -1,9 +1,32 @@
-// app/admin-panel/comisiones/page.tsx
-import { getAllCommissions } from "@/lib/services/commission-service"
+"use client"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
-export default async function ComisionesPage() {
-  const comisiones = await getAllCommissions()
+export default function ComisionesPage() {
+  const [comisiones, setComisiones] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  async function fetchComisiones() {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/committees", { cache: "no-store" })
+      const data = await res.json()
+      setComisiones(data)
+    } catch {
+      setComisiones([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchComisiones()
+  }, [])
+
+  const handleDelete = async (id: number) => {
+    await fetch(`/api/committees/${id}`, { method: "DELETE" })
+    fetchComisiones()
+  }
 
   return (
     <div className="space-y-6">
@@ -16,7 +39,11 @@ export default async function ComisionesPage() {
 
       <div className="bg-white border rounded shadow-sm">
         <ul className="space-y-4">
-          {comisiones.map((comision) => (
+          {loading ? (
+            <li className="p-4 text-center text-gray-400">Cargando...</li>
+          ) : comisiones.length === 0 ? (
+            <li className="text-center py-8 text-gray-500">No hay comisiones creadas aún.</li>
+          ) : comisiones.map((comision) => (
             <li
               key={comision.id}
               className="flex justify-between items-center p-4 bg-white shadow rounded border border-gray-200 hover:bg-gray-50 transition cursor-pointer"
@@ -39,23 +66,16 @@ export default async function ComisionesPage() {
                 </div>
               </Link>
               <div className="flex space-x-2 ml-4">
-                <Link
-                  href={`/admin-panel/comisiones/${comision.id}/eliminar`}
+                <button
+                  onClick={() => handleDelete(comision.id)}
                   className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                  prefetch={false}
                 >
                   Eliminar
-                </Link>
+                </button>
               </div>
             </li>
           ))}
         </ul>
-
-        {comisiones.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <p>No hay comisiones creadas aún.</p>
-          </div>
-        )}
       </div>
     </div>
   )

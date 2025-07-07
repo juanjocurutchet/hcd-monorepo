@@ -1,0 +1,1 @@
+ALTER TABLE committees ADD COLUMN secretary_hcd_id INTEGER REFERENCES staff(id);

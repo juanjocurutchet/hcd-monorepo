@@ -42,14 +42,20 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [concejales, setConcejales] = useState<{ id: string | number; name: string }[]>([])
-  const { apiRequest, isAuthenticated } = useApiRequest() // ✅ Usar hook
+  const [concejales, setConcejales] = useState<{ id: number; name: string }[]>([])
+  const [secretariosHcd, setSecretariosHcd] = useState<{ id: number; name: string }[]>([])
+  const { apiRequest, isAuthenticated } = useApiRequest()
+
+  // Determinar el valor inicial del select único de secretario/a
+  let initialSecretaryValue = "none"
+  if (comision?.secretaryId) initialSecretaryValue = `council-${comision.secretaryId}`
+  else if (comision?.secretaryHcdId) initialSecretaryValue = `staff-${comision.secretaryHcdId}`
 
   const [formData, setFormData] = useState({
     name: comision?.name || "",
     description: comision?.description || "",
     presidentId: comision?.presidentId?.toString() || "none",
-    secretaryId: comision?.secretaryId?.toString() || "none", // ✅ Añadir secretario
+    secretaryValue: initialSecretaryValue,
     isActive: comision?.isActive ?? true,
   })
 
@@ -78,26 +84,26 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
   useEffect(() => {
     const fetchConcejales = async () => {
       try {
-        // ✅ Este endpoint puede ser público para listar concejales
         const response = await fetch("/api/council-members")
-        if (!response.ok) {
-          throw new Error("Error al cargar los concejales")
-        }
+        if (!response.ok) throw new Error("Error al cargar los concejales")
         const data = await response.json()
         setConcejales(data)
+        const resStaff = await fetch("/api/staff?position=secretario_hcd")
+        if (resStaff.ok) {
+          const staffData = await resStaff.json()
+          setSecretariosHcd(staffData)
+        }
       } catch (err) {
         console.error("Error:", err)
         setError("Error al cargar los concejales")
       }
     }
-
     fetchConcejales()
   }, [])
 
   // Cargar proyectos existentes al editar
   useEffect(() => {
     if (comision && comision.id) {
-      console.log("Cargando proyectos para comisión:", comision.id)
       fetch(`/api/committees/${comision.id}/files`)
         .then(res => {
           if (!res.ok) {
@@ -127,6 +133,14 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
     }
   }, [comision, concejales])
 
+  // Unir concejales y miembros actuales de la comisión para las opciones del select
+  const allMemberOptions = [
+    ...concejales,
+    ...((comision?.members || []).filter(
+      m => !concejales.some(c => c.id.toString() === m.id.toString())
+    ))
+  ];
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
@@ -155,60 +169,58 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
-
     if (!isAuthenticated) {
       setError("No hay sesión activa")
       return
     }
-
     setIsSubmitting(true)
     setError("")
-
     try {
       if (!formData.name.trim()) {
         throw new Error("El nombre es requerido")
       }
-
-      if (formData.presidentId === formData.secretaryId && formData.presidentId && formData.presidentId !== "none") {
+      if (formData.presidentId === formData.secretaryValue && formData.presidentId && formData.presidentId !== "none") {
         throw new Error("El presidente y secretario deben ser personas diferentes")
       }
-
-      // Usar FormData para enviar archivos
-      const fd = new FormData()
-      fd.append("name", formData.name)
-      fd.append("description", formData.description)
-      fd.append("presidentId", formData.presidentId === "none" ? "" : formData.presidentId)
-      fd.append("secretaryId", formData.secretaryId === "none" ? "" : formData.secretaryId)
-      fd.append("isActive", String(formData.isActive))
-      fd.append("memberIds", JSON.stringify(selectedMembers))
-
-      // Solo enviar proyectos si estamos CREANDO una nueva comisión
-      // Si estamos editando, los proyectos se manejan individualmente
-      if (!comision) {
-        // Serializar proyectos sin el campo archivo (que no es serializable)
-        const proyectosToSend = proyectos.map(p => {
-          const { archivo, ...rest } = p
-          return rest
-        })
-        fd.append("proyectos", JSON.stringify(proyectosToSend))
-        proyectos.forEach((p, idx) => {
-          if (p.archivo) {
-            fd.append(`archivo_${idx}`, p.archivo)
-          }
+      // Determinar los campos a guardar según el valor del select
+      let secretaryId = null
+      let secretaryHcdId = null
+      if (formData.secretaryValue.startsWith("council-")) {
+        secretaryId = Number(formData.secretaryValue.replace("council-", ""))
+      } else if (formData.secretaryValue.startsWith("staff-")) {
+        secretaryHcdId = Number(formData.secretaryValue.replace("staff-", ""))
+      }
+      const url = comision ? `/api/committees/${comision.id}` : "/api/committees"
+      const method = comision ? "PUT" : "POST"
+      if (comision) {
+        await apiRequest(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            description: formData.description,
+            presidentId: formData.presidentId === "none" ? null : Number(formData.presidentId),
+            secretaryId,
+            secretaryHcdId,
+            isActive: formData.isActive,
+            memberIds: selectedMembers,
+          }),
         })
       } else {
-        // En edición, enviar array vacío para que no se eliminen los proyectos existentes
-        fd.append("proyectos", JSON.stringify([]))
+        await apiRequest(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            description: formData.description,
+            presidentId: formData.presidentId === "none" ? null : Number(formData.presidentId),
+            secretaryId,
+            secretaryHcdId,
+            isActive: formData.isActive,
+            memberIds: selectedMembers,
+          }),
+        })
       }
-
-      const url = comision ? `/api/committees/${comision.id}` : "/api/committees/create"
-      const method = comision ? "PUT" : "POST"
-
-      await apiRequest(url, {
-        method,
-        body: fd,
-      })
-
       router.push("/admin-panel/comisiones")
       router.refresh()
     } catch (err) {
@@ -284,7 +296,6 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
       if (res.ok) {
         const updated = await res.json()
         setEditProyectos(prev => prev.map((p, i) => i === idx ? updated : p))
-        console.log("Proyecto guardado correctamente")
       } else {
         console.error("Error al guardar proyecto")
       }
@@ -322,7 +333,6 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
 
       if (res.ok) {
         setEditProyectos(prev => prev.filter((_, i) => i !== idx))
-        console.log("Proyecto eliminado correctamente")
       } else {
         console.error("Error al eliminar proyecto")
       }
@@ -399,21 +409,25 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
               </Select>
             </div>
 
-            {/* ✅ Campo para secretario */}
             <div className="space-y-2">
-              <Label htmlFor="secretaryId">Secretario</Label>
+              <Label htmlFor="secretaryValue">Secretario/a</Label>
               <Select
-                value={formData.secretaryId}
-                onValueChange={(value: string) => handleSelectChange("secretaryId", value)}
+                value={formData.secretaryValue}
+                onValueChange={(value: string) => handleSelectChange("secretaryValue", value)}
               >
-                <SelectTrigger id="secretaryId">
-                  <SelectValue placeholder="Seleccionar secretario" />
+                <SelectTrigger id="secretaryValue">
+                  <SelectValue placeholder="Seleccionar secretario/a" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Sin secretario</SelectItem>
+                  <SelectItem value="none">Sin secretario/a</SelectItem>
                   {concejales.map((concejal) => (
-                    <SelectItem key={concejal.id} value={concejal.id.toString()}>
+                    <SelectItem key={`council-${concejal.id}`} value={`council-${concejal.id}`}>
                       {concejal.name}
+                    </SelectItem>
+                  ))}
+                  {secretariosHcd.map((s) => (
+                    <SelectItem key={`staff-${s.id}`} value={`staff-${s.id}`}>
+                      {s.name} (Secretario/a HCD)
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -431,9 +445,9 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
               value={selectedMembers}
               onChange={(values) => setSelectedMembers(values)}
               optionLabelProp="label"
-              options={concejales.map((concejal) => ({
-                value: concejal.id.toString(),
-                label: concejal.name,
+              options={allMemberOptions.map((m) => ({
+                value: m.id.toString(),
+                label: m.name,
               }))}
             />
           </div>

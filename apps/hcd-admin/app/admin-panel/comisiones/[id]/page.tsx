@@ -29,12 +29,17 @@ export default async function EditarComisionPage({ params }: PageProps) {
             description: comision.description ?? undefined,
             presidentId: comision.presidentId ? String(comision.presidentId) : undefined,
             secretaryId: comision.secretaryId ? String(comision.secretaryId) : undefined,
-            members: Array.isArray(comision.members)
-              ? comision.members.map((m: any) => ({
-                  id: m.id ? String(m.id) : "",
+            members: Array.isArray(comision.miembros)
+              ? comision.miembros.map((m: any) => ({
+                  id: m.councilMemberId ? String(m.councilMemberId) : (m.id ? String(m.id) : ""),
                   name: m.name ?? ""
                 }))
-              : [],
+              : (Array.isArray(comision.members)
+                ? comision.members.map((m: any) => ({
+                    id: m.id ? String(m.id) : "",
+                    name: m.name ?? ""
+                  }))
+                : []),
           }}
         />
       </div>

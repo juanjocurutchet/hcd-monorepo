@@ -7,10 +7,10 @@ export async function GET(request: NextRequest) {
     const onlyPublished = searchParams.get("onlyPublished") !== "false";
     // Puedes agregar más filtros si lo necesitas
     const sesiones = await getSessions({ onlyPublished });
-    return NextResponse.json(sesiones);
+    return NextResponse.json(sesiones, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Error en GET /api/sessions:", error);
-    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500, headers: { "Cache-Control": "no-store" } });
   }
 }
 

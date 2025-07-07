@@ -120,7 +120,6 @@ export default function ActividadesPage() {
 
   const handleSelectActivity = (activity: Activity) => {
     // Aquí puedes implementar la lógica para mostrar detalles de la actividad
-    console.log('Actividad seleccionada:', activity)
   }
 
   const isToday = (date: Date) => {

@@ -13,7 +13,8 @@ export async function isAdmin(request: NextRequest): Promise<boolean> {
       return false
     }
 
-    return token.role === "admin"
+    // Verificar si el usuario tiene rol de ADMIN o SUPERADMIN
+    return token.role === "ADMIN" || token.role === "SUPERADMIN"
   } catch (error) {
     console.error("Error al verificar el token de NextAuth:", error)
     return false

@@ -1,5 +1,5 @@
-import { neon } from "@neondatabase/serverless"
-import { drizzle } from "drizzle-orm/neon-http"
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 
 // Verificar que la variable de entorno existe
 if (!process.env.DATABASE_URL) {
@@ -7,27 +7,39 @@ if (!process.env.DATABASE_URL) {
 }
 
 // Crear una instancia singleton de la conexión
-let sqlInstance: ReturnType<typeof neon> | null = null
-let dbInstance: ReturnType<typeof drizzle> | null = null
+let globalForDb = globalThis as unknown as { dbInstance?: ReturnType<typeof drizzle>, sqlInstance?: ReturnType<typeof neon> };
 
-export function getSql() {
-  if (!sqlInstance) {
-    console.log("Creando nueva conexión a la base de datos...")
-    sqlInstance = neon(process.env.DATABASE_URL!)
+function getSql() {
+  if (process.env.NODE_ENV === "development") {
+    if (!globalForDb.sqlInstance) {
+      console.log("[DEV] Creando nueva conexión a la base de datos...");
+      globalForDb.sqlInstance = neon(process.env.DATABASE_URL!);
+    }
+    return globalForDb.sqlInstance;
+  } else {
+    if (!sqlInstance) {
+      sqlInstance = neon(process.env.DATABASE_URL!);
+    }
+    return sqlInstance;
   }
-  return sqlInstance
 }
 
-export function getDb() {
-  if (!dbInstance) {
-    dbInstance = drizzle(getSql())
+function getDb() {
+  if (process.env.NODE_ENV === "development") {
+    if (!globalForDb.dbInstance) {
+      globalForDb.dbInstance = drizzle(getSql());
+    }
+    return globalForDb.dbInstance;
+  } else {
+    if (!dbInstance) {
+      dbInstance = drizzle(getSql());
+    }
+    return dbInstance;
   }
-  return dbInstance
 }
 
-// Exportar para compatibilidad
-export const sql = getSql()
-export const db = getDb()
+export const sql = getSql();
+export const db = getDb();
 
 // Función de prueba de conexión
 export async function testConnection() {
