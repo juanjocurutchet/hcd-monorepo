@@ -1,19 +1,17 @@
 "use client"
 
 import {
-  Activity,
-  Calendar,
-  FileText,
-  Home,
-  Layers,
-  LogOut,
-  Menu,
-  MessageSquare,
-  Newspaper,
-  User,
-  UserPlus,
-  Users,
-  X,
+    Activity,
+    Calendar,
+    FileText,
+    Home,
+    Layers,
+    LogOut,
+    Menu,
+    User,
+    UserPlus,
+    Users,
+    X
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
@@ -53,15 +51,12 @@ export default function AdminPanelLayoutClient({ children }: { children: ReactNo
 
   const navItems = [
     { name: "Dashboard", href: "/admin-panel/dashboard", icon: <Home className="h-5 w-5" /> },
-    { name: "Noticias", href: "/admin-panel/noticias", icon: <Newspaper className="h-5 w-5" /> },
-    { name: "Documentos", href: "/admin-panel/documentos", icon: <FileText className="h-5 w-5" /> },
+    { name: "Disposiciones", href: "/admin-panel/documentos", icon: <FileText className="h-5 w-5" /> },
     { name: "Sesiones", href: "/admin-panel/sesiones", icon: <Calendar className="h-5 w-5" /> },
     { name: "Concejales", href: "/admin-panel/concejales", icon: <User className="h-5 w-5" /> },
-    { name: "Personal", href: "/admin-panel/personal", icon: <Users className="h-5 w-5" /> },
     { name: "Bloques", href: "/admin-panel/bloques", icon: <Users className="h-5 w-5" /> },
     { name: "Comisiones", href: "/admin-panel/comisiones", icon: <Layers className="h-5 w-5" /> },
     { name: "Actividades", href: "/admin-panel/actividades", icon: <Activity className="h-5 w-5" /> },
-    { name: "Mensajes", href: "/admin-panel/mensajes", icon: <MessageSquare className="h-5 w-5" /> },
     { name: "Usuarios", href: "/admin-panel/usuarios", icon: <UserPlus className="h-5 w-5" /> },
   ]
 

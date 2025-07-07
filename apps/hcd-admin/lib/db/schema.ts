@@ -127,6 +127,11 @@ export const activities = pgTable("activities", {
   date: timestamp("date").notNull(),
   imageUrl: varchar("image_url", { length: 255 }),
   isPublished: boolean("is_published").default(true).notNull(),
+  // Configuración de notificaciones
+  enableNotifications: boolean("enable_notifications").default(true).notNull(),
+  notificationAdvance: integer("notification_advance").default(24).notNull(), // Horas de anticipación
+  notificationEmails: text("notification_emails"), // Emails separados por comas
+  lastNotificationSent: timestamp("last_notification_sent"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })

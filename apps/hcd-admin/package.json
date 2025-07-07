@@ -4,11 +4,12 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --port 5001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "send-notifications": "tsx scripts/send-activity-notifications.ts"
   },
   "dependencies": {
     "@repo/ui": "*",
@@ -24,6 +25,7 @@
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
     "eslint": "^9.30.0",
+    "tsx": "^4.20.3",
     "typescript": "5.8.2"
   }
 }
