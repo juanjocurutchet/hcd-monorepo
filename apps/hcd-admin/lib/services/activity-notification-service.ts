@@ -12,7 +12,7 @@ interface Activity {
   imageUrl?: string
   isPublished: boolean
   enableNotifications: boolean
-  notificationAdvance: number
+  notificationAdvance: string
   notificationEmails?: string
   lastNotificationSent?: string
 }
@@ -66,21 +66,31 @@ export class ActivityNotificationService {
 
     for (const activity of allActivities) {
       const activityDate = new Date(activity.date)
-      const notificationTime = new Date(activityDate.getTime() - (activity.notificationAdvance * 60 * 60 * 1000))
 
-      // Verificar si es momento de enviar la notificación
-      const shouldNotify = now >= notificationTime && now <= activityDate
+      // Procesar múltiples anticipaciones
+      const advances = activity.notificationAdvance.split(',').map(a => a.trim()).filter(a => a)
 
-      // Verificar si no se ha enviado notificación recientemente (últimas 2 horas)
-      const lastNotification = activity.lastNotificationSent
-        ? new Date(activity.lastNotificationSent)
-        : null
+      for (const advance of advances) {
+        const advanceHours = parseInt(advance)
+        if (isNaN(advanceHours)) continue
 
-      const recentlyNotified = lastNotification &&
-        (now.getTime() - lastNotification.getTime()) < (2 * 60 * 60 * 1000)
+        const notificationTime = new Date(activityDate.getTime() - (advanceHours * 60 * 60 * 1000))
 
-      if (shouldNotify && !recentlyNotified) {
-        activitiesNeedingNotification.push(activity)
+        // Verificar si es momento de enviar la notificación para esta anticipación
+        const shouldNotify = now >= notificationTime && now <= activityDate
+
+        // Verificar si no se ha enviado notificación recientemente (últimas 2 horas)
+        const lastNotification = activity.lastNotificationSent
+          ? new Date(activity.lastNotificationSent)
+          : null
+
+        const recentlyNotified = lastNotification &&
+          (now.getTime() - lastNotification.getTime()) < (2 * 60 * 60 * 1000)
+
+        if (shouldNotify && !recentlyNotified) {
+          activitiesNeedingNotification.push(activity)
+          break // Solo agregar una vez por actividad
+        }
       }
     }
 

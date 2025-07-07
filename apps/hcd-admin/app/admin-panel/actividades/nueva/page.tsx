@@ -13,7 +13,7 @@ interface ActivityForm {
   imageUrl: string
   isPublished: boolean
   enableNotifications: boolean
-  notificationAdvance: number
+  notificationAdvance: string
   notificationEmails: string
 }
 
@@ -28,7 +28,7 @@ export default function NuevaActividadPage() {
     imageUrl: "",
     isPublished: true,
     enableNotifications: true,
-    notificationAdvance: 24,
+    notificationAdvance: "24",
     notificationEmails: ""
   })
   const [loading, setLoading] = useState(false)
@@ -224,41 +224,19 @@ export default function NuevaActividadPage() {
             {form.enableNotifications && (
               <>
                 {/* Notification Advance */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Anticipación de notificación (horas)
-                  </label>
-                  <select
+                <div className="mb-6">
+                  <NotificationAdvanceSelector
                     value={form.notificationAdvance}
-                    onChange={(e) => handleInputChange('notificationAdvance', parseInt(e.target.value))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value={1}>1 hora antes</option>
-                    <option value={2}>2 horas antes</option>
-                    <option value={6}>6 horas antes</option>
-                    <option value={12}>12 horas antes</option>
-                    <option value={24}>1 día antes</option>
-                    <option value={48}>2 días antes</option>
-                    <option value={72}>3 días antes</option>
-                    <option value={168}>1 semana antes</option>
-                  </select>
+                    onChange={(value) => handleInputChange('notificationAdvance', value)}
+                  />
                 </div>
 
                 {/* Notification Emails */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Emails para notificaciones
-                  </label>
-                  <textarea
-                    rows={3}
+                <div className="mb-6">
+                  <ContactSelector
                     value={form.notificationEmails}
-                    onChange={(e) => handleInputChange('notificationEmails', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="concejales@hcdlasflores.gob.ar, admin@hcdlasflores.gob.ar"
+                    onChange={(value) => handleInputChange('notificationEmails', value)}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Separa múltiples emails con comas
-                  </p>
                 </div>
               </>
             )}

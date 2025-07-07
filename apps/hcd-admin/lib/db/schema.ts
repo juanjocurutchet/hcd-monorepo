@@ -129,7 +129,7 @@ export const activities = pgTable("activities", {
   isPublished: boolean("is_published").default(true).notNull(),
   // Configuración de notificaciones
   enableNotifications: boolean("enable_notifications").default(true).notNull(),
-  notificationAdvance: integer("notification_advance").default(24).notNull(), // Horas de anticipación
+  notificationAdvance: text("notification_advance").default("24").notNull(), // Anticipaciones separadas por comas (ej: "24,1")
   notificationEmails: text("notification_emails"), // Emails separados por comas
   lastNotificationSent: timestamp("last_notification_sent"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -225,9 +225,38 @@ export const ordinance_modifica = pgTable('ordinance_modifica', {
   observaciones: text('observaciones'),
 });
 
+export const contacts = pgTable("contacts", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  phone: varchar("phone", { length: 50 }),
+  organization: varchar("organization", { length: 255 }),
+  notes: text("notes"),
+  position: varchar("position", { length: 100 }), // Ej: "Concejal", "Secretario", "Admin"
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+export const contactGroups = pgTable("contact_groups", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+export const contactGroupMembers = pgTable("contact_group_members", {
+  id: serial("id").primaryKey(),
+  contactId: integer("contact_id").notNull().references(() => contacts.id, { onDelete: "cascade" }),
+  groupId: integer("group_id").notNull().references(() => contactGroups.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
 export const usersRelations = relations(users, ({ many }) => ({
   news: many(news),
   documents: many(documents),
+  sessions: many(sessions),
 }))
 
 export const newsRelations = relations(news, ({ one }) => ({
@@ -303,5 +332,24 @@ export const ordinancesRelations = relations(ordinances, ({ one }) => ({
   type: one(ordinanceTypes, {
     fields: [ordinances.type],
     references: [ordinanceTypes.name],
+  }),
+}))
+
+export const contactsRelations = relations(contacts, ({ many }) => ({
+  groupMemberships: many(contactGroupMembers),
+}))
+
+export const contactGroupsRelations = relations(contactGroups, ({ many }) => ({
+  members: many(contactGroupMembers),
+}))
+
+export const contactGroupMembersRelations = relations(contactGroupMembers, ({ one }) => ({
+  contact: one(contacts, {
+    fields: [contactGroupMembers.contactId],
+    references: [contacts.id],
+  }),
+  group: one(contactGroups, {
+    fields: [contactGroupMembers.groupId],
+    references: [contactGroups.id],
   }),
 }))

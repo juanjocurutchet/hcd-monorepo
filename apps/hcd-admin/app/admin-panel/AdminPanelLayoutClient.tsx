@@ -7,6 +7,7 @@ import {
     Home,
     Layers,
     LogOut,
+    Mail,
     Menu,
     User,
     UserPlus,
@@ -57,6 +58,7 @@ export default function AdminPanelLayoutClient({ children }: { children: ReactNo
     { name: "Bloques", href: "/admin-panel/bloques", icon: <Users className="h-5 w-5" /> },
     { name: "Comisiones", href: "/admin-panel/comisiones", icon: <Layers className="h-5 w-5" /> },
     { name: "Actividades", href: "/admin-panel/actividades", icon: <Activity className="h-5 w-5" /> },
+    { name: "Contactos", href: "/admin-panel/contactos", icon: <Mail className="h-5 w-5" /> },
     { name: "Usuarios", href: "/admin-panel/usuarios", icon: <UserPlus className="h-5 w-5" /> },
   ]
 
