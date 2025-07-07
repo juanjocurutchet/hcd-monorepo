@@ -1,5 +1,6 @@
 import { db } from "@/lib/db-singleton"
 import { councilMembers } from "@/lib/db/schema"
+import { uploadFile } from "@/lib/storage"
 import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -28,11 +29,34 @@ export async function PUT(
 ) {
   try {
     const id = parseInt(params.id)
-    const body = await request.json()
+    let updateData: any = {}
+
+    const contentType = request.headers.get("content-type") || ""
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData()
+      // Parsear campos planos
+      for (const [key, value] of formData.entries()) {
+        if (key === "image" && typeof value === "object" && "arrayBuffer" in value && value.size > 0) {
+          // Subida real a Cloudinary
+          const imageUrl = await uploadFile(value, "council-members")
+          updateData.imageUrl = imageUrl
+        } else if (key === "isActive") {
+          // Checkbox: puede venir como "true" o "false"
+          updateData.isActive = value === "true"
+        } else if (key === "blockId") {
+          // Puede venir como "-1" para sin bloque
+          updateData.blockId = value === "-1" ? null : Number(value)
+        } else {
+          updateData[key] = value
+        }
+      }
+    } else {
+      updateData = await request.json()
+    }
 
     const [updatedMember] = await db
       .update(councilMembers)
-      .set(body)
+      .set(updateData)
       .where(eq(councilMembers.id, id))
       .returning()
 

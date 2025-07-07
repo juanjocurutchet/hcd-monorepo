@@ -1,10 +1,10 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { PoliticalBlockWithPresident } from "@/actions/council-actions"
-import { useApiRequest } from "@/hooks/useApiRequest" // ✅ Importar hook
+import { PoliticalBlockWithPresident } from "@/actions/council-actions";
+import { useApiRequest } from "@/hooks/useApiRequest"; // ✅ Importar hook
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
 
 interface EliminarBloqueFormProps {
   bloque: PoliticalBlockWithPresident
@@ -34,8 +34,7 @@ export default function EliminarBloqueForm({ bloque }: EliminarBloqueFormProps) 
         method: "DELETE",
       })
 
-      router.push("/admin-panel/bloques")
-      router.refresh()
+      window.location.href = '/admin-panel/bloques'
     } catch (error: any) {
       console.error("Error:", error)
       setError(error.message || "Error desconocido")

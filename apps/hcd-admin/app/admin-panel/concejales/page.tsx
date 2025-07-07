@@ -1,9 +1,28 @@
-import { getActiveCouncilMembersByBlock } from "@/actions/council-actions"
+"use client"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { ConcejalFicha } from "./components/ConcejalFicha"
 
-export default async function ConcejalesPage() {
-  const concejales = await getActiveCouncilMembersByBlock()
+export default function ConcejalesPage() {
+  const [concejales, setConcejales] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  async function fetchConcejales() {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/council-members", { cache: "reload" })
+      const data = await res.json()
+      setConcejales(data)
+    } catch {
+      setConcejales([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchConcejales()
+  }, [])
 
   // Agrupar por bloque
   const concejalesPorBloque = concejales.reduce<Record<string, typeof concejales>>((acc, concejal) => {
@@ -23,7 +42,9 @@ export default async function ConcejalesPage() {
       </div>
 
       <div className="space-y-6">
-        {Object.entries(concejalesPorBloque).map(([bloque, concejalesDelBloque]) => (
+        {loading ? (
+          <div className="text-center text-gray-400">Cargando...</div>
+        ) : Object.entries(concejalesPorBloque).map(([bloque, concejalesDelBloque]) => (
           <div key={bloque} className="bg-white border rounded shadow-sm">
             <h2 className="px-4 py-3 font-semibold bg-gray-100 border-b">Bloque: {bloque}</h2>
             <ul>

@@ -1,10 +1,10 @@
 // EliminarConcejalForm
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface EliminarConcejalFormProps {
   concejal: {
@@ -43,8 +43,7 @@ export default function EliminarConcejalForm({ concejal }: EliminarConcejalFormP
         throw new Error(errorData.error || "Error al eliminar el concejal")
       }
 
-      router.push("/admin-panel/concejales")
-      router.refresh()
+      window.location.href = "/admin-panel/concejales"
     } catch (err) {
       console.error("Error al eliminar concejal:", err)
       setError("No se pudo eliminar el concejal.")

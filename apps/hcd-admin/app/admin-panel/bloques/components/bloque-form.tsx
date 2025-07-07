@@ -22,21 +22,58 @@ export default function BloqueForm({ bloque, concejales, miembrosActuales = [] }
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [miembrosSeleccionados, setMiembrosSeleccionados] = useState<number[]>([])
+  const [presidenteSeleccionado, setPresidenteSeleccionado] = useState<string>(bloque?.president?.id?.toString() || "-1")
   const router = useRouter()
   const { apiRequest, isAuthenticated } = useApiRequest()
+
+  // Logs para debug
+  console.log("BloqueForm - bloque recibido:", bloque?.name, "presidente:", bloque?.president?.name, "miembros:", miembrosActuales.length)
+  console.log("BloqueForm - miembrosSeleccionados actual:", miembrosSeleccionados)
 
   // Memoizar los concejales disponibles para evitar recálculos innecesarios
   const concejalesDisponibles = useMemo(() => {
     return concejales.filter(concejal => concejal.isActive)
   }, [concejales])
 
-  // Inicializar miembros seleccionados solo una vez
+  // Inicializar miembros seleccionados cuando cambien los datos
   useEffect(() => {
-    if (bloque && miembrosActuales.length > 0) {
+    console.log("BloqueForm - useEffect ejecutándose")
+    console.log("BloqueForm - bloque:", bloque)
+    console.log("BloqueForm - miembrosActuales:", miembrosActuales)
+
+    if (bloque && miembrosActuales && miembrosActuales.length > 0) {
       const ids = miembrosActuales.map(m => m.id)
-      setMiembrosSeleccionados(ids)
+      console.log("BloqueForm - IDs de miembros a seleccionar:", ids)
+
+      // Solo actualizar si los IDs son diferentes
+      const currentIds = miembrosSeleccionados.sort().join(',')
+      const newIds = ids.sort().join(',')
+
+      if (currentIds !== newIds) {
+        console.log("BloqueForm - Actualizando miembros seleccionados de", miembrosSeleccionados, "a", ids)
+        setMiembrosSeleccionados(ids)
+      }
+    } else if (bloque && (!miembrosActuales || miembrosActuales.length === 0)) {
+      // Si no hay miembros, limpiar la selección
+      if (miembrosSeleccionados.length > 0) {
+        console.log("BloqueForm - Limpiando miembros seleccionados")
+        setMiembrosSeleccionados([])
+      }
     }
-  }, [bloque?.id, miembrosActuales.length]) // Solo dependencias estables
+  }, [bloque?.id, miembrosActuales]) // Solo dependencias estables
+
+  // Actualizar presidenteSeleccionado si cambia el bloque o los miembros
+  useEffect(() => {
+    // Si el presidente actual ya no es miembro, resetear
+    if (bloque?.president?.id && miembrosSeleccionados.includes(bloque.president.id)) {
+      setPresidenteSeleccionado(bloque.president.id.toString())
+    } else {
+      setPresidenteSeleccionado("-1")
+    }
+  }, [bloque?.president?.id, miembrosSeleccionados])
+
+  // Log para ver el estado actual de miembrosSeleccionados
+  console.log("BloqueForm - miembrosSeleccionados actual:", miembrosSeleccionados)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -51,9 +88,8 @@ export default function BloqueForm({ bloque, concejales, miembrosActuales = [] }
     setSuccess("")
 
     const formData = new FormData(e.currentTarget)
-
-    // Agregar los miembros seleccionados al FormData
     formData.append("miembros", JSON.stringify(miembrosSeleccionados))
+    formData.set("presidentId", presidenteSeleccionado)
 
     try {
       const url = bloque ? `/api/political-blocks/${bloque.id}` : "/api/political-blocks/create"
@@ -68,7 +104,7 @@ export default function BloqueForm({ bloque, concejales, miembrosActuales = [] }
       setSuccess(bloque ? "Bloque actualizado correctamente" : "Bloque creado correctamente")
 
       if (!bloque) {
-        router.push("/admin-panel/bloques")
+        window.location.href = '/admin-panel/bloques'
       }
       router.refresh()
     } catch (error: any) {
@@ -118,17 +154,21 @@ export default function BloqueForm({ bloque, concejales, miembrosActuales = [] }
           Presidente del Bloque
         </label>
         <select
+          key={`president-${presidenteSeleccionado}`}
           id="presidentId"
           name="presidentId"
-          defaultValue={bloque?.president?.id?.toString() || "-1"}
+          value={presidenteSeleccionado}
+          onChange={(e) => setPresidenteSeleccionado(e.target.value)}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="-1">Sin presidente asignado</option>
-          {concejales.map((concejal) => (
-            <option key={concejal.id} value={concejal.id.toString()}>
-              {concejal.name} - {concejal.position || "Concejal"}
-            </option>
-          ))}
+          {concejales
+            .filter((concejal) => miembrosSeleccionados.includes(concejal.id))
+            .map((concejal) => (
+              <option key={concejal.id} value={concejal.id.toString()}>
+                {concejal.name} - {concejal.position || "Concejal"}
+              </option>
+            ))}
         </select>
       </div>
 
@@ -149,12 +189,16 @@ export default function BloqueForm({ bloque, concejales, miembrosActuales = [] }
       <div className="space-y-4">
         <h3 className="text-lg font-medium text-gray-900">Miembros del Bloque</h3>
         <AntdSelect
+          key={`members-${miembrosSeleccionados.join(',')}`}
           mode="multiple"
           allowClear
           style={{ width: '100%' }}
           placeholder="Agregar miembros"
           value={miembrosSeleccionados.map(String)}
-          onChange={(values) => setMiembrosSeleccionados(values.map(Number))}
+          onChange={(values) => {
+            console.log("Miembros cambiados a:", values)
+            setMiembrosSeleccionados(values.map(Number))
+          }}
           optionLabelProp="label"
           options={concejalesDisponibles.map((concejal) => ({
             value: concejal.id.toString(),

@@ -31,7 +31,7 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
     setSuccess("")
 
     const formData = new FormData(e.currentTarget)
-    const url = concejal?.id ? `/api/council-members/${concejal.id}` : "/api/council-members/create"
+    const url = concejal?.id ? `/api/council-members/${concejal.id}` : "/api/council-members"
     const method = concejal?.id ? "PUT" : "POST"
 
     try {
@@ -43,7 +43,7 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
       })
 
       setSuccess(concejal ? "Concejal actualizado correctamente" : "Concejal creado correctamente")
-      router.push("/admin-panel/concejales")
+      window.location.href = "/admin-panel/concejales"
       router.refresh()
     } catch (err: any) {
       console.error("Error:", err)
