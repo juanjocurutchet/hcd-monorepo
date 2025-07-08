@@ -1,6 +1,7 @@
 "use client"
 
-import { Mail, Plus, User, Users, X } from "lucide-react"
+import { Select } from "antd"
+import { User, Users, X } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface Contact {
@@ -25,49 +26,28 @@ interface ContactGroup {
 interface ContactSelectorProps {
   value: string
   onChange: (value: string) => void
+  compact?: boolean
 }
 
 export default function ContactSelector({ value, onChange }: ContactSelectorProps) {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [groups, setGroups] = useState<ContactGroup[]>([])
-  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([])
-  const [selectedGroups, setSelectedGroups] = useState<ContactGroup[]>([])
-  const [customEmail, setCustomEmail] = useState("")
-  const [showCustomEmail, setShowCustomEmail] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState<string[]>([])
 
   useEffect(() => {
     fetchContactsAndGroups()
   }, [])
 
   useEffect(() => {
-    // Convertir el string de emails a arrays de contactos y grupos seleccionados
+    // Actualizar chips seleccionados desde value externo
     if (value) {
-      const emails = value.split(',').map(e => e.trim()).filter(e => e)
-      const selectedContactsList: Contact[] = []
-      const selectedGroupsList: ContactGroup[] = []
-
-      // Procesar emails que corresponden a contactos individuales
-      emails.forEach(email => {
-        const contact = contacts.find(c => c.email === email)
-        if (contact) {
-          selectedContactsList.push(contact)
-        }
-      })
-
-      // Procesar emails que corresponden a grupos
-      groups.forEach(group => {
-        const groupEmails = group.members.map(m => m.contact.email)
-        const hasGroupEmails = groupEmails.some(email => emails.includes(email))
-        if (hasGroupEmails) {
-          selectedGroupsList.push(group)
-        }
-      })
-
-      setSelectedContacts(selectedContactsList)
-      setSelectedGroups(selectedGroupsList)
+      const emails = value.split(',').map(v => v.trim()).filter(Boolean)
+      setSelected(emails)
+    } else {
+      setSelected([])
     }
-  }, [value, contacts, groups])
+  }, [value])
 
   const fetchContactsAndGroups = async () => {
     try {
@@ -84,290 +64,121 @@ export default function ContactSelector({ value, onChange }: ContactSelectorProp
     }
   }
 
-  const handleToggleContact = (contact: Contact) => {
-    const isSelected = selectedContacts.some(c => c.email === contact.email)
+  // Unificar contactos y grupos en las opciones del select
+  const options = [
+    ...contacts.map(contact => ({
+      label: (
+        <span className="flex items-center gap-2"><User className="w-4 h-4 text-blue-600" />{contact.name}<span className="text-gray-500">({contact.email})</span></span>
+      ),
+      value: contact.email,
+      type: 'contact',
+      email: contact.email,
+      name: contact.name
+    })),
+    ...groups.map(group => ({
+      label: (
+        <span className="flex items-center gap-2"><Users className="w-4 h-4 text-green-600" />{group.name}<span className="text-gray-500">({group.memberCount} miembros)</span></span>
+      ),
+      value: `group:${group.id}`,
+      type: 'group',
+      groupId: group.id,
+      name: group.name
+    }))
+  ]
 
-    if (isSelected) {
-      const newContacts = selectedContacts.filter(c => c.email !== contact.email)
-      setSelectedContacts(newContacts)
-      updateEmails(newContacts, selectedGroups)
-    } else {
-      const newContacts = [...selectedContacts, contact]
-      setSelectedContacts(newContacts)
-      updateEmails(newContacts, selectedGroups)
-    }
-  }
-
-  const handleToggleGroup = (group: ContactGroup) => {
-    const isSelected = selectedGroups.some(g => g.id === group.id)
-
-    if (isSelected) {
-      const newGroups = selectedGroups.filter(g => g.id !== group.id)
-      setSelectedGroups(newGroups)
-      updateEmails(selectedContacts, newGroups)
-    } else {
-      const newGroups = [...selectedGroups, group]
-      setSelectedGroups(newGroups)
-      updateEmails(selectedContacts, newGroups)
-    }
-  }
-
-  const updateEmails = (contacts: Contact[], groups: ContactGroup[]) => {
-    const allEmails = new Set<string>()
-
-    // Agregar emails de contactos individuales
-    contacts.forEach(contact => allEmails.add(contact.email))
-
-    // Agregar emails de grupos
-    groups.forEach(group => {
-      group.members.forEach(member => allEmails.add(member.contact.email))
-    })
-
-    onChange(Array.from(allEmails).join(', '))
-  }
-
-  const handleAddCustomEmail = () => {
-    if (customEmail && !selectedContacts.some(c => c.email === customEmail)) {
-      const newContact: Contact = {
-        id: Date.now(),
-        name: customEmail,
-        email: customEmail,
-        role: "Personalizado"
+  // Cuando cambia la selección en el select
+  const handleChange = (selectedValues: string[]) => {
+    // Convertir los values del select a emails
+    const emails: string[] = []
+    selectedValues.forEach(val => {
+      if (val.startsWith('group:')) {
+        const groupId = Number(val.replace('group:', ''))
+        const group = groups.find(g => g.id === groupId)
+        if (group) {
+          group.members.forEach(m => emails.push(m.contact.email))
+        }
+      } else {
+        emails.push(val)
       }
-
-      const newContacts = [...selectedContacts, newContact]
-      setSelectedContacts(newContacts)
-      updateEmails(newContacts, selectedGroups)
-      setCustomEmail("")
-      setShowCustomEmail(false)
-    }
+    })
+    // Quitar duplicados
+    const uniqueEmails = Array.from(new Set(emails))
+    setSelected(uniqueEmails)
+    onChange(uniqueEmails.join(', '))
   }
 
-  const handleRemoveContact = (email: string) => {
-    const newContacts = selectedContacts.filter(c => c.email !== email)
-    setSelectedContacts(newContacts)
-    updateEmails(newContacts, selectedGroups)
-  }
+  // El value del select solo debe contener los valores seleccionados de contactos y grupos (no emails personalizados)
+  const selectValue = selected
+    .map(email => {
+      const contact = contacts.find(c => c.email === email)
+      if (contact) return contact.email
+      const group = groups.find(g => g.members.some(m => m.contact.email === email))
+      if (group) return `group:${group.id}`
+      return null
+    })
+    .filter(Boolean) as string[]
 
-  const handleRemoveGroup = (groupId: number) => {
-    const newGroups = selectedGroups.filter(g => g.id !== groupId)
-    setSelectedGroups(newGroups)
-    updateEmails(selectedContacts, newGroups)
-  }
-
-  const handleSelectAll = () => {
-    setSelectedContacts(contacts)
-    setSelectedGroups(groups)
-    updateEmails(contacts, groups)
-  }
-
-  const handleClearAll = () => {
-    setSelectedContacts([])
-    setSelectedGroups([])
-    onChange("")
-  }
-
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700">
-            Contactos para notificaciones
-          </label>
-        </div>
-        <div className="flex items-center justify-center h-32">
-          <div className="text-gray-500">Cargando contactos...</div>
-        </div>
-      </div>
-    )
+  // Eliminar chip
+  const handleRemoveChip = (email: string) => {
+    const newSelected = selected.filter(e => e !== email)
+    setSelected(newSelected)
+    onChange(newSelected.join(', '))
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
-          Contactos para notificaciones
-        </label>
-        <div className="flex space-x-2">
-          <button
-            type="button"
-            onClick={handleSelectAll}
-            className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-          >
-            Seleccionar todos
-          </button>
-          <button
-            type="button"
-            onClick={handleClearAll}
-            className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-          >
-            Limpiar
-          </button>
-        </div>
-      </div>
-
-      {/* Grupos de contactos */}
-      {groups.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">Grupos de contactos</h4>
-          <div className="grid grid-cols-1 gap-2">
-            {groups.map((group) => (
-              <label
-                key={group.id}
-                className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedGroups.some(g => g.id === group.id)}
-                  onChange={() => handleToggleGroup(group)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 text-gray-400 mr-2" />
-                    <span className="text-sm font-medium text-gray-900">{group.name}</span>
-                    <span className="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
-                      {group.memberCount} contacto{group.memberCount !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                  {group.description && (
-                    <p className="text-xs text-gray-600 mt-1">{group.description}</p>
-                  )}
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Contactos individuales */}
-      {contacts.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">Contactos individuales</h4>
-          <div className="grid grid-cols-1 gap-2">
-            {contacts.map((contact) => (
-              <label
-                key={contact.id}
-                className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedContacts.some(c => c.email === contact.email)}
-                  onChange={() => handleToggleContact(contact)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <div className="ml-3 flex-1">
-                  <div className="flex items-center">
-                    <User className="w-4 h-4 text-gray-400 mr-2" />
-                    <span className="text-sm font-medium text-gray-900">{contact.name}</span>
-                    {contact.role && (
-                      <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                        {contact.role}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center mt-1">
-                    <Mail className="w-3 h-3 text-gray-400 mr-1" />
-                    <span className="text-xs text-gray-600">{contact.email}</span>
-                  </div>
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Email personalizado */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-medium text-gray-700">Email personalizado</h4>
-          <button
-            type="button"
-            onClick={() => setShowCustomEmail(!showCustomEmail)}
-            className="flex items-center text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
-          >
-            <Plus className="w-3 h-3 mr-1" />
-            {showCustomEmail ? "Cancelar" : "Agregar"}
-          </button>
-        </div>
-
-        {showCustomEmail && (
-          <div className="flex space-x-2">
-            <input
-              type="email"
-              value={customEmail}
-              onChange={(e) => setCustomEmail(e.target.value)}
-              placeholder="email@ejemplo.com"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
-            <button
-              type="button"
-              onClick={handleAddCustomEmail}
-              disabled={!customEmail}
-              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
-            >
-              Agregar
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Contactos seleccionados */}
-      {(selectedContacts.length > 0 || selectedGroups.length > 0) && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">Seleccionados</h4>
-
-          {/* Grupos seleccionados */}
-          {selectedGroups.map((group) => (
-            <div
-              key={group.id}
-              className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-lg"
-            >
-              <div className="flex items-center">
-                <Users className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-sm text-blue-900">{group.name}</span>
-                <span className="ml-2 text-xs text-blue-700">({group.memberCount} contacto{group.memberCount !== 1 ? 's' : ''})</span>
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Agregar contactos o grupos</label>
+      <Select
+        mode="multiple"
+        showSearch
+        allowClear
+        loading={loading}
+        style={{ width: 340, minWidth: 220, maxWidth: '100%' }}
+        dropdownMatchSelectWidth={false}
+        placeholder="Agregar contactos o grupos…"
+        value={selectValue}
+        onChange={handleChange}
+        options={options}
+        optionLabelProp="label"
+        maxTagCount={0}
+        filterOption={(input, option) => {
+          if (!option) return false;
+          const label = (option.label as any)?.props?.children?.map ? (option.label as any).props.children.map((c: any) => typeof c === 'string' ? c : c.props?.children).join(' ') : option.label;
+          return label.toLowerCase().includes(input.toLowerCase());
+        }}
+      />
+      {/* Chips debajo del input */}
+      <div className="flex flex-wrap gap-2 mt-2">
+        {selected.map(email => {
+          const contact = contacts.find(c => c.email === email)
+          if (contact) {
+            return (
+              <div key={email} className="flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs">
+                <User className="w-3 h-3 mr-1" />
+                {contact.name} <span className="mx-1">|</span> {contact.email}
+                <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => handleRemoveChip(email)} />
               </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveGroup(group.id)}
-                className="text-red-600 hover:text-red-800"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-
-          {/* Contactos individuales seleccionados */}
-          {selectedContacts.map((contact) => (
-            <div
-              key={contact.id}
-              className="flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-lg"
-            >
-              <div className="flex items-center">
-                <Mail className="w-4 h-4 text-blue-600 mr-2" />
-                <span className="text-sm text-blue-900">{contact.name}</span>
-                <span className="ml-2 text-xs text-blue-700">({contact.email})</span>
+            )
+          }
+          const group = groups.find(g => g.members.some(m => m.contact.email === email))
+          if (group) {
+            return (
+              <div key={email + group.id} className="flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs">
+                <Users className="w-3 h-3 mr-1" />
+                {group.name}
+                <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => handleRemoveChip(email)} />
               </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveContact(contact.email)}
-                className="text-red-600 hover:text-red-800"
-              >
-                <X className="w-4 h-4" />
-              </button>
+            )
+          }
+          // Email personalizado (por si acaso)
+          return (
+            <div key={email} className="flex items-center px-2 py-1 rounded-full bg-gray-200 text-gray-800 text-xs">
+              {email}
+              <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => handleRemoveChip(email)} />
             </div>
-          ))}
-        </div>
-      )}
-
-      {selectedContacts.length === 0 && selectedGroups.length === 0 && (
-        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-xs text-yellow-800">
-            ⚠️ No se enviarán notificaciones. Selecciona al menos un contacto o grupo.
-          </p>
-        </div>
-      )}
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -12,11 +12,10 @@ export async function GET() {
       .where(eq(contacts.isActive, true))
       .orderBy(contacts.name)
 
-    // Obtener todos los grupos activos
+    // Obtener todos los grupos
     const allGroups = await db
       .select()
       .from(contactGroups)
-      .where(eq(contactGroups.isActive, true))
       .orderBy(contactGroups.name)
 
     // Para cada grupo, obtener sus miembros
