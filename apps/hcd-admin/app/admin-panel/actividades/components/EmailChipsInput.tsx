@@ -43,7 +43,6 @@ export default function EmailChipsInput({ value, onChange }: EmailChipsInputProp
     const newEmails = emails.filter(e => e !== email)
     setEmails(newEmails)
     onChange(newEmails.join(", "))
-    // Focus al input después de eliminar
     setTimeout(() => inputRef.current?.focus(), 0)
   }
 

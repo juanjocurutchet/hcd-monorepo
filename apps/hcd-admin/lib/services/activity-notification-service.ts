@@ -23,7 +23,8 @@ export class ActivityNotificationService {
    */
   static async sendUpcomingActivityNotifications() {
     try {
-      const now = new Date()
+      const nowUTC = new Date()
+      const now = new Date(nowUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
 
       // Obtener actividades que necesitan notificación
       const activitiesToNotify = await this.getActivitiesNeedingNotification()
@@ -48,7 +49,8 @@ export class ActivityNotificationService {
    * Obtiene actividades que necesitan notificación
    */
   private static async getActivitiesNeedingNotification(): Promise<Activity[]> {
-    const now = new Date()
+    const nowUTC = new Date()
+    const now = new Date(nowUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
 
     // Obtener todas las actividades futuras con notificaciones habilitadas
     const allActivities = await db
@@ -65,19 +67,33 @@ export class ActivityNotificationService {
     const activitiesNeedingNotification: Activity[] = []
 
     for (const activity of allActivities) {
-      const activityDate = new Date(activity.date)
+      const activityDateUTC = new Date(activity.date)
+      const activityDateArgentina = new Date(activityDateUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
 
       // Procesar múltiples anticipaciones
       const advances = activity.notificationAdvance.split(',').map(a => a.trim()).filter(a => a)
 
       for (const advance of advances) {
-        const advanceHours = parseInt(advance)
-        if (isNaN(advanceHours)) continue
+        // Soporta formatos como "10_minutes", "1_hours", "1_days"
+        let advanceMs = 0
+        const match = advance.match(/(\d+)_?(minutes|hours|days)?/)
+        if (match) {
+          const value = parseInt(match[1])
+          const unit = match[2] || 'hours'
+          if (unit === 'minutes') advanceMs = value * 60 * 1000
+          else if (unit === 'hours') advanceMs = value * 60 * 60 * 1000
+          else if (unit === 'days') advanceMs = value * 24 * 60 * 60 * 1000
+        } else {
+          // fallback: tratar como horas
+          const value = parseInt(advance)
+          if (!isNaN(value)) advanceMs = value * 60 * 60 * 1000
+        }
+        if (!advanceMs) continue
 
-        const notificationTime = new Date(activityDate.getTime() - (advanceHours * 60 * 60 * 1000))
+        const notificationTime = new Date(activityDateArgentina.getTime() - advanceMs)
 
         // Verificar si es momento de enviar la notificación para esta anticipación
-        const shouldNotify = now >= notificationTime && now <= activityDate
+        const shouldNotify = now >= notificationTime && now <= activityDateArgentina
 
         // Verificar si no se ha enviado notificación recientemente (últimas 2 horas)
         const lastNotification = activity.lastNotificationSent
@@ -108,8 +124,9 @@ export class ActivityNotificationService {
       }
 
       const emails = activity.notificationEmails.split(',').map(email => email.trim())
-      const activityDate = new Date(activity.date)
-      const timeUntilActivity = this.getTimeUntilActivity(activityDate)
+      const activityDateUTC = new Date(activity.date)
+      const activityDateArgentina = new Date(activityDateUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+      const timeUntilActivity = this.getTimeUntilActivity(activityDateArgentina)
 
       const subject = `Recordatorio: ${activity.title} - ${timeUntilActivity}`
 
@@ -166,8 +183,9 @@ export class ActivityNotificationService {
    * Genera el HTML del email de notificación
    */
   private static generateNotificationEmail(activity: Activity, timeUntil: string): string {
-    const activityDate = new Date(activity.date)
-    const formattedDate = activityDate.toLocaleDateString('es-ES', {
+    const activityDateUTC = new Date(activity.date)
+    const activityDateArgentina = new Date(activityDateUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+    const formattedDate = activityDateArgentina.toLocaleDateString('es-AR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -231,8 +249,9 @@ export class ActivityNotificationService {
    * Genera el texto plano del email de notificación
    */
   private static generateNotificationEmailText(activity: Activity, timeUntil: string): string {
-    const activityDate = new Date(activity.date)
-    const formattedDate = activityDate.toLocaleDateString('es-ES', {
+    const activityDateUTC = new Date(activity.date)
+    const activityDateArgentina = new Date(activityDateUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+    const formattedDate = activityDateArgentina.toLocaleDateString('es-AR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

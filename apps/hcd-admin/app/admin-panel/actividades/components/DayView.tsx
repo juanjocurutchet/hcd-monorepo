@@ -31,7 +31,11 @@ export default function DayView({
   const getActivitiesForDate = (date: Date) => {
     return activities.filter(activity => {
       const activityDate = new Date(activity.date)
-      return activityDate.toDateString() === date.toDateString()
+      return (
+        activityDate.getFullYear() === date.getFullYear() &&
+        activityDate.getMonth() === date.getMonth() &&
+        activityDate.getDate() === date.getDate()
+      )
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   }
 
@@ -52,8 +56,18 @@ export default function DayView({
     })
   }
 
+  function getArgentinaDate(date: Date) {
+    return new Date(date.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+  }
+
   const isToday = (date: Date) => {
-    return date.toDateString() === new Date().toDateString()
+    const nowAR = getArgentinaDate(new Date())
+    const dateAR = getArgentinaDate(date)
+    return (
+      nowAR.getFullYear() === dateAR.getFullYear() &&
+      nowAR.getMonth() === dateAR.getMonth() &&
+      nowAR.getDate() === dateAR.getDate()
+    )
   }
 
   const dayActivities = getActivitiesForDate(currentDate)

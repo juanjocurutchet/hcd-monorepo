@@ -3,7 +3,9 @@
 import { ChevronLeft, ChevronRight, FileText, Plus } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import DayView from "./components/DayView"
 import NotificationManager from "./components/NotificationManager"
+import WeekView from "./components/WeekView"
 
 interface Activity {
   id: number
@@ -75,7 +77,11 @@ export default function ActividadesPage() {
   const getActivitiesForDate = (date: Date) => {
     return activities.filter(activity => {
       const activityDate = new Date(activity.date)
-      return activityDate.toDateString() === date.toDateString()
+      return (
+        activityDate.getFullYear() === date.getFullYear() &&
+        activityDate.getMonth() === date.getMonth() &&
+        activityDate.getDate() === date.getDate()
+      )
     })
   }
 
@@ -122,8 +128,30 @@ export default function ActividadesPage() {
     // Aquí puedes implementar la lógica para mostrar detalles de la actividad
   }
 
+  const getArgentinaDate = (date: Date) => {
+    return new Date(date.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+  }
+
   const isToday = (date: Date) => {
-    return date.toDateString() === new Date().toDateString()
+    const nowAR = getArgentinaDate(new Date())
+    const dateAR = getArgentinaDate(date)
+    return (
+      nowAR.getFullYear() === dateAR.getFullYear() &&
+      nowAR.getMonth() === dateAR.getMonth() &&
+      nowAR.getDate() === dateAR.getDate()
+    )
+  }
+
+  const isTomorrow = (date: Date) => {
+    const nowAR = getArgentinaDate(new Date())
+    const dateAR = getArgentinaDate(date)
+    const tomorrow = new Date(nowAR)
+    tomorrow.setDate(nowAR.getDate() + 1)
+    return (
+      tomorrow.getFullYear() === dateAR.getFullYear() &&
+      tomorrow.getMonth() === dateAR.getMonth() &&
+      tomorrow.getDate() === dateAR.getDate()
+    )
   }
 
   const isSelected = (date: Date) => {

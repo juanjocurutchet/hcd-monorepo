@@ -1,8 +1,12 @@
 "use client"
 
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Loader2, Save, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import ContactSelector from "../../components/ContactSelector"
+import EmailChipsInput from "../../components/EmailChipsInput"
+import NotificationFrequencySelector from "../../components/NotificationFrequencySelector"
 
 interface Activity {
   id: number
@@ -28,6 +32,22 @@ interface ActivityForm {
   enableNotifications: boolean
   notificationAdvance: string
   notificationEmails: string
+  customEmail?: string
+}
+
+function getArgentinaDateString(dateUTC: Date) {
+  const dateAR = new Date(dateUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+  const yyyy = dateAR.getFullYear()
+  const mm = String(dateAR.getMonth() + 1).padStart(2, '0')
+  const dd = String(dateAR.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
+function getArgentinaTimeString(dateUTC: Date) {
+  const dateAR = new Date(dateUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+  const hh = String(dateAR.getHours()).padStart(2, '0')
+  const min = String(dateAR.getMinutes()).padStart(2, '0')
+  return `${hh}:${min}`
 }
 
 export default function EditarActividadPage({ params }: { params: { id: string } }) {
@@ -43,7 +63,8 @@ export default function EditarActividadPage({ params }: { params: { id: string }
     isPublished: true,
     enableNotifications: true,
     notificationAdvance: "24",
-    notificationEmails: ""
+    notificationEmails: "",
+    customEmail: ""
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -62,8 +83,8 @@ export default function EditarActividadPage({ params }: { params: { id: string }
 
         // Convertir la fecha ISO a fecha y hora separadas
         const activityDate = new Date(data.date)
-        const dateStr = activityDate.toISOString().split('T')[0]
-        const timeStr = activityDate.toTimeString().slice(0, 5)
+        const dateStr = getArgentinaDateString(activityDate)
+        const timeStr = getArgentinaTimeString(activityDate)
 
         setForm({
           title: data.title,
@@ -75,7 +96,8 @@ export default function EditarActividadPage({ params }: { params: { id: string }
           isPublished: data.isPublished,
           enableNotifications: data.enableNotifications ?? true,
           notificationAdvance: data.notificationAdvance ?? "24",
-          notificationEmails: data.notificationEmails || ""
+          notificationEmails: data.notificationEmails || "",
+          customEmail: data.customEmail || ""
         })
       } else {
         setError('Actividad no encontrada')
@@ -93,8 +115,10 @@ export default function EditarActividadPage({ params }: { params: { id: string }
     setError("")
 
     try {
-      // Combinar fecha y hora
-      const dateTime = new Date(`${form.date}T${form.time}`)
+      // Combinar fecha y hora en local (Argentina)
+      const [year, month, day] = form.date.split('-').map(Number)
+      const [hour, minute] = form.time.split(':').map(Number)
+      const dateTime = new Date(year, month - 1, day, hour, minute)
 
       const activityData = {
         title: form.title,
@@ -105,7 +129,8 @@ export default function EditarActividadPage({ params }: { params: { id: string }
         isPublished: form.isPublished,
         enableNotifications: form.enableNotifications,
         notificationAdvance: form.notificationAdvance,
-        notificationEmails: form.notificationEmails || null
+        notificationEmails: form.notificationEmails || null,
+        customEmail: form.customEmail || null
       }
 
       const response = await fetch(`/api/activities/${params.id}`, {
@@ -285,42 +310,55 @@ export default function EditarActividadPage({ params }: { params: { id: string }
             </label>
           </div>
 
-          {/* Notification Settings */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Configuración de Notificaciones</h3>
-            {/* Enable Notifications */}
-            <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                id="enableNotifications"
-                checked={form.enableNotifications}
-                onChange={(e) => handleInputChange('enableNotifications', e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="enableNotifications" className="ml-2 text-sm text-gray-700">
-                Habilitar notificaciones por email
-              </label>
-            </div>
-            {form.enableNotifications && (
-              <>
-                {/* Notification Advance */}
-                <div className="mb-6">
-                  <NotificationAdvanceSelector
-                    value={form.notificationAdvance}
-                    onChange={(value) => handleInputChange('notificationAdvance', value)}
+          {/* Accordion para notificaciones (igual que en nueva) */}
+          <Accordion type="single" collapsible>
+            <AccordionItem value="notificaciones">
+              <AccordionTrigger>
+                <span className="text-lg font-medium text-gray-900">Notificaciones</span>
+              </AccordionTrigger>
+              <AccordionContent>
+                {/* Habilitar notificaciones */}
+                <div className="flex items-center mb-4 mt-6">
+                  <input
+                    type="checkbox"
+                    id="enableNotifications"
+                    checked={form.enableNotifications}
+                    onChange={(e) => handleInputChange('enableNotifications', e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
+                  <label htmlFor="enableNotifications" className="ml-2 text-sm text-gray-700">
+                    Habilitar notificaciones por email
+                  </label>
                 </div>
-
-                {/* Notification Emails */}
-                <div className="mb-6">
-                  <ContactSelector
-                    value={form.notificationEmails}
-                    onChange={(value) => handleInputChange('notificationEmails', value)}
-                  />
-                </div>
-              </>
-            )}
-          </div>
+                {form.enableNotifications && (
+                  <>
+                    {/* Frecuencia de notificación */}
+                    <div className="mb-6">
+                      <NotificationFrequencySelector
+                        value={form.notificationAdvance}
+                        onChange={(value) => handleInputChange('notificationAdvance', value)}
+                      />
+                    </div>
+                    {/* Contactos y grupos */}
+                    <div className="mb-6">
+                      <ContactSelector
+                        value={form.notificationEmails}
+                        onChange={(value) => handleInputChange('notificationEmails', value)}
+                        compact
+                      />
+                    </div>
+                    {/* Email personalizado (chips) */}
+                    <div className="mb-6">
+                      <EmailChipsInput
+                        value={form.customEmail || ""}
+                        onChange={emails => handleInputChange('customEmail', emails)}
+                      />
+                    </div>
+                  </>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-4">

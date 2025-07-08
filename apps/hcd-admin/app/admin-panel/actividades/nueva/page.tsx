@@ -46,8 +46,10 @@ export default function NuevaActividadPage() {
     setError("")
 
     try {
-      // Combinar fecha y hora
-      const dateTime = new Date(`${form.date}T${form.time}`)
+      // Combinar fecha y hora en local (Argentina)
+      const [year, month, day] = form.date.split('-').map(Number)
+      const [hour, minute] = form.time.split(':').map(Number)
+      const dateTime = new Date(year, month - 1, day, hour, minute)
 
       const activityData = {
         title: form.title,

@@ -29,9 +29,9 @@ export default function UpcomingActivities() {
         const allActivities: Activity[] = await response.json()
 
         // Filtrar actividades futuras y ordenar por fecha
-        const now = new Date()
+        const nowAR = getArgentinaDate(new Date())
         const upcoming = allActivities
-          .filter(activity => new Date(activity.date) > now)
+          .filter(activity => getArgentinaDate(new Date(activity.date)) > nowAR)
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
           .slice(0, 5) // Mostrar solo las próximas 5
 
@@ -55,11 +55,18 @@ export default function UpcomingActivities() {
     })
   }
 
+  const getArgentinaDate = (date: Date) => {
+    return new Date(date.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+  }
+
   const getDaysUntil = (dateString: string) => {
-    const activityDate = new Date(dateString)
-    const now = new Date()
-    const diffTime = activityDate.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const activityDateAR = getArgentinaDate(new Date(dateString))
+    const nowAR = getArgentinaDate(new Date())
+    // Normalizar a medianoche para comparar solo fechas
+    const activityMidnight = new Date(activityDateAR.getFullYear(), activityDateAR.getMonth(), activityDateAR.getDate())
+    const nowMidnight = new Date(nowAR.getFullYear(), nowAR.getMonth(), nowAR.getDate())
+    const diffTime = activityMidnight.getTime() - nowMidnight.getTime()
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
 
     if (diffDays === 0) return 'Hoy'
     if (diffDays === 1) return 'Mañana'
