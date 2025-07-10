@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, Edit, Eye, EyeOff, MapPin, Plus, Trash2 } from "lucide-react"
+import { Calendar, MapPin, Plus } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
@@ -108,22 +108,7 @@ export default function ListaActividadesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Lista de Actividades</h1>
-        <div className="flex space-x-4">
-          <Link
-            href="/admin-panel/actividades"
-            className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Vista Calendario
-          </Link>
-          <Link
-            href="/admin-panel/actividades/nueva"
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Actividad
-          </Link>
-        </div>
+        {/* Botones de vista calendario y nueva actividad eliminados */}
       </div>
 
       {/* Filters */}
@@ -220,27 +205,7 @@ export default function ListaActividadesPage() {
                 </div>
 
                 <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleTogglePublish(activity.id, activity.isPublished)}
-                    className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
-                    title={activity.isPublished ? 'Ocultar' : 'Publicar'}
-                  >
-                    {activity.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                  <Link
-                    href={`/admin-panel/actividades/${activity.id}/editar`}
-                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg"
-                    title="Editar"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(activity.id)}
-                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg"
-                    title="Eliminar"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {/* Botones de editar, eliminar y publicar/ocultar eliminados */}
                 </div>
               </div>
             </div>

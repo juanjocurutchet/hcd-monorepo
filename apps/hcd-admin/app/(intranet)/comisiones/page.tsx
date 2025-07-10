@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 import { useEffect, useState } from "react"
 
 export default function ComisionesPage() {
@@ -32,9 +31,9 @@ export default function ComisionesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Comisiones</h1>
-        <Link href="/admin-panel/comisiones/nueva" className="text-blue-600 hover:underline">
+        {/* <Link href="/admin-panel/comisiones/nueva" className="text-blue-600 hover:underline">
           Agregar comisión
-        </Link>
+        </Link> */}
       </div>
 
       <div className="bg-white border rounded shadow-sm">
@@ -48,12 +47,7 @@ export default function ComisionesPage() {
               key={comision.id}
               className="flex justify-between items-center p-4 bg-white shadow rounded border border-gray-200 hover:bg-gray-50 transition cursor-pointer"
             >
-              <Link
-                href={`/admin-panel/comisiones/${comision.id}`}
-                className="flex-1 flex items-center space-x-4 min-w-0"
-                prefetch={false}
-                style={{ textDecoration: 'none' }}
-              >
+              <div className="flex-1 flex items-center space-x-4 min-w-0">
                 <div className="w-2 h-10 rounded bg-blue-400" />
                 <div className="min-w-0">
                   <p className="text-lg font-semibold truncate">{comision.name}</p>
@@ -64,15 +58,8 @@ export default function ComisionesPage() {
                     </div>
                   )}
                 </div>
-              </Link>
-              <div className="flex space-x-2 ml-4">
-                <button
-                  onClick={() => handleDelete(comision.id)}
-                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                >
-                  Eliminar
-                </button>
               </div>
+              {/* Botón de eliminar eliminado */}
             </li>
           ))}
         </ul>

@@ -56,26 +56,7 @@ export default function DisposicionesPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                onClick={e => {
-                  e.stopPropagation();
-                  router.push(`/admin-panel/documentos/nuevo?tipo=${tipo.value}`);
-                }}
-                className="ml-4"
-              >
-                Crear
-              </Button>
-              {tipo.value === "ordenanza" && (
-                <Button
-                  variant="outline"
-                  onClick={e => {
-                    e.stopPropagation();
-                    router.push(`/admin-panel/documentos/editar/ordenanza`);
-                  }}
-                >
-                  Editar
-                </Button>
-              )}
+              {/* Botones de crear y editar eliminados */}
             </div>
           </div>
         ))}

@@ -111,18 +111,7 @@ export default function UsuariosTableClient() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button
-                      onClick={() => { setSelectedUser(user); setShowEditModal(true) }}
-                      className="text-blue-600 hover:text-blue-900 text-sm px-4 py-1 border border-blue-200 rounded hover:bg-blue-50 transition"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => { setSelectedUser(user); setShowDeleteModal(true) }}
-                      className="text-red-600 hover:text-red-900 text-sm px-4 py-1 border border-red-200 rounded hover:bg-red-50 transition ml-2"
-                    >
-                      Eliminar
-                    </button>
+                    {/* Botones de editar y eliminar eliminados */}
                   </td>
                 </tr>
               ))}
@@ -131,31 +120,7 @@ export default function UsuariosTableClient() {
         </div>
       </div>
       {/* Modal de confirmación para eliminar */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-lg font-bold mb-4">¿Eliminar usuario?</h2>
-            <p>¿Estás seguro de que deseas eliminar a <b>{selectedUser?.name}</b>?</p>
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 border rounded">Cancelar</button>
-              <button onClick={() => handleDelete(selectedUser.id)} className="px-4 py-2 bg-red-600 text-white rounded">Eliminar</button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Modal de confirmación para editar */}
-      {showEditModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-lg font-bold mb-4">¿Editar usuario?</h2>
-            <p>¿Deseas editar a <b>{selectedUser?.name}</b>?</p>
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded">Cancelar</button>
-              <button onClick={() => { setShowEditModal(false); router.push(`/admin-panel/usuarios/${selectedUser.id}`) }} className="px-4 py-2 bg-blue-600 text-white rounded">Editar</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }

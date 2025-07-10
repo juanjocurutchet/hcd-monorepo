@@ -1,7 +1,6 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, FileText, Plus } from "lucide-react"
-import Link from "next/link"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
 import DayView from "./components/DayView"
 import NotificationManager from "./components/NotificationManager"
@@ -173,22 +172,7 @@ export default function ActividadesPage() {
             {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Calendario de Actividades</h1>
-        <div className="flex space-x-4">
-          <Link
-            href="/admin-panel/actividades/lista"
-            className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            Vista Lista
-          </Link>
-          <Link
-            href="/admin-panel/actividades/nueva"
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Actividad
-          </Link>
-        </div>
+        {/* Botones de vista lista y nueva actividad eliminados */}
       </div>
 
       {/* Calendar Controls */}

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils/format";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -51,9 +50,9 @@ export default function SesionesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Sesiones</h1>
-        <Link href="/admin-panel/sesiones/nueva" className="text-blue-600 hover:underline">
+        {/* <Link href="/admin-panel/sesiones/nueva" className="text-blue-600 hover:underline">
           Agregar sesión
-        </Link>
+        </Link> */}
       </div>
 
       {loading ? (
@@ -83,13 +82,6 @@ export default function SesionesPage() {
                   </p>
                 </div>
               </Link>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => handleDelete(sesion.id)}
-              >
-                Eliminar
-              </Button>
             </li>
           ))}
         </ul>

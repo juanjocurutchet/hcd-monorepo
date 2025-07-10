@@ -28,12 +28,7 @@ export default function BloquesListPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Bloques</h1>
-        <Link
-          href="/admin-panel/bloques/nuevo"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Crear nuevo bloque
-        </Link>
+        {/* Botón de crear nuevo bloque eliminado */}
       </div>
 
       {loading ? (
@@ -77,12 +72,7 @@ export default function BloquesListPage() {
                 </div>
               </Link>
               <div className="flex space-x-2 ml-4">
-                <Link
-                  href={`/admin-panel/bloques/${bloque.id}/eliminar`}
-                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                >
-                  Eliminar
-                </Link>
+                {/* Botones de editar y eliminar eliminados */}
               </div>
             </li>
           ))}

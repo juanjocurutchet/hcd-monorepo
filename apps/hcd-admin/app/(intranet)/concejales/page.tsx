@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 import { useEffect, useState } from "react"
 import { ConcejalFicha } from "./components/ConcejalFicha"
 
@@ -36,9 +35,9 @@ export default function ConcejalesPage() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Concejales</h1>
-        <Link href="/admin-panel/concejales/nuevo" className="text-blue-600 hover:underline">
+        {/* <Link href="/admin-panel/concejales/nuevo" className="text-blue-600 hover:underline">
           Agregar concejal
-        </Link>
+        </Link> */}
       </div>
 
       <div className="space-y-6">
@@ -58,20 +57,7 @@ export default function ConcejalesPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Link
-                      href={`/admin-panel/concejales/${concejal.id}`}
-                      className="text-blue-600 hover:underline"
-                      prefetch={false}
-                    >
-                      Editar
-                    </Link>
-                    <Link
-                      href={`/admin-panel/concejales/${concejal.id}/eliminar`}
-                      className="text-red-600 hover:underline"
-                      prefetch={false}
-                    >
-                      Eliminar
-                    </Link>
+                    {/* Botones de editar y eliminar eliminados */}
                   </div>
                 </li>
               ))}

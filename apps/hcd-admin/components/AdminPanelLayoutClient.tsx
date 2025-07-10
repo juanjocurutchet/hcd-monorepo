@@ -20,6 +20,7 @@ import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { ReactNode } from "react"
+import Image from "next/image"
 
 export default function AdminPanelLayoutClient({ children }: { children: ReactNode }) {
   const pathname = usePathname()
@@ -51,6 +52,11 @@ export default function AdminPanelLayoutClient({ children }: { children: ReactNo
   }
 
   const navItems = [
+    // Este botón va separado visualmente
+    { name: "Ir a la Intranet", href: "/", icon: (
+      <Image src="/logo_hcd.png" alt="Logo HCD" width={24} height={24} className="rounded-full" />
+    ) },
+    // Resto de los botones
     { name: "Dashboard", href: "/admin-panel-dashboard", icon: <Home className="h-5 w-5" /> },
     { name: "Disposiciones", href: "/admin-panel-dashboard/documentos", icon: <FileText className="h-5 w-5" /> },
     { name: "Sesiones", href: "/admin-panel-dashboard/sesiones", icon: <Calendar className="h-5 w-5" /> },
@@ -81,7 +87,19 @@ export default function AdminPanelLayoutClient({ children }: { children: ReactNo
           </div>
           <nav className="flex-1 px-2 py-4 overflow-y-auto">
             <ul className="space-y-1">
-              {navItems.map((item) => (
+              {/* Botón de ir a la intranet separado visualmente */}
+              <li className="mb-4">
+                <Link
+                  href={navItems[0].href}
+                  prefetch={true}
+                  className={`flex items-center px-4 py-2 text-base font-semibold rounded-md bg-[#e6f0fa] text-[#0e4c7d] hover:bg-[#d0e3f7] transition`}
+                >
+                  {navItems[0].icon}
+                  <span className="ml-3">{navItems[0].name}</span>
+                </Link>
+              </li>
+              {/* Resto de los botones */}
+              {navItems.slice(1).map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
