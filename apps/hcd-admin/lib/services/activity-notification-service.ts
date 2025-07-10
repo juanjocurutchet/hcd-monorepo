@@ -92,8 +92,9 @@ export class ActivityNotificationService {
 
         const notificationTime = new Date(activityDateArgentina.getTime() - advanceMs)
 
-        // Verificar si es momento de enviar la notificación para esta anticipación
-        const shouldNotify = now >= notificationTime && now <= activityDateArgentina
+        // Verificar si es momento de enviar la notificación para esta anticipación (ventana de 1 minuto)
+        const windowMs = 60 * 1000; // 1 minuto
+        const shouldNotify = Math.abs(now.getTime() - notificationTime.getTime()) < windowMs;
 
         // Verificar si no se ha enviado notificación recientemente (últimas 2 horas)
         const lastNotification = activity.lastNotificationSent

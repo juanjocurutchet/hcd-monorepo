@@ -39,6 +39,10 @@ const authOptions: NextAuthOptions = {
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // Siempre redirigir a la home interna tras login
+      return `${baseUrl}/`;
+    },
   },
   pages: {
     signIn: "/admin-panel/login",

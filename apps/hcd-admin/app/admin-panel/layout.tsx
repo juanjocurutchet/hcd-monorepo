@@ -1,11 +1,4 @@
-import React from "react";
-import AdminPanelLayoutClient from "./AdminPanelLayoutClient";
-import SessionProviderWrapper from "./SessionProviderWrapper";
-
-export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <SessionProviderWrapper>
-      <AdminPanelLayoutClient>{children}</AdminPanelLayoutClient>
-    </SessionProviderWrapper>
-  );
+// Eliminar todo el contenido, este layout ya no debe envolver nada ni importar AdminPanelLayoutClient.
+export default function AdminPanelEmptyLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

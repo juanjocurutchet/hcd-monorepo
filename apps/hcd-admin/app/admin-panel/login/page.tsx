@@ -22,13 +22,13 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
+        callbackUrl: "/"
       })
 
       if (result?.error) {
         setError("Credenciales inválidas")
       } else {
-        router.push("/admin-panel")
-        router.refresh()
+        window.location.href = "/"
       }
     } catch (err) {
       setError("Error al iniciar sesión")
