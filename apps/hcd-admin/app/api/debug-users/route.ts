@@ -11,7 +11,7 @@ export async function GET() {
 
     // Consulta con SQL raw para verificar
     const rawQuery = await db.execute("SELECT COUNT(*) as count FROM users");
-    const count = rawQuery[0]?.count;
+    const count = (rawQuery as any)[0]?.count;
 
     console.log(`[DEBUG] Usuarios encontrados: ${allUsers.length}`);
     console.log(`[DEBUG] Count SQL raw: ${count}`);
@@ -25,6 +25,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[DEBUG] Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as any).message }, { status: 500 });
   }
 }

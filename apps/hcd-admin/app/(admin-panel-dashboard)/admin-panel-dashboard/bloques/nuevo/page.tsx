@@ -13,7 +13,7 @@ export default async function NuevoBloquePage() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <BloqueForm concejales={concejales} />
+        <BloqueForm concejales={concejales.map(c => ({...c, createdAt: new Date(), updatedAt: new Date()}))} />
       </div>
     </div>
   )

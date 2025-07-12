@@ -9,7 +9,7 @@ export default async function EditBloquePage({ params }: { params: { id: string 
   if (!bloque) return notFound()
 
   // Aquí deberías obtener los concejales activos (puedes ajustar según tu lógica)
-  const concejales = bloque.members || []
+  const concejales = (bloque as any).members || []
 
   return (
     <div className="space-y-4">
@@ -17,7 +17,7 @@ export default async function EditBloquePage({ params }: { params: { id: string 
       <BloqueForm
         bloque={bloque}
         concejales={concejales}
-        miembrosActuales={bloque.members}
+        miembrosActuales={(bloque as any).members}
       />
     </div>
   )

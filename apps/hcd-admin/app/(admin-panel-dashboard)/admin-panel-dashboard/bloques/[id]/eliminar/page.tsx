@@ -7,5 +7,5 @@ export default async function EliminarBloquePage({ params }: { params: { id: str
   const bloque = await getPoliticalBlockById(Number(id))
   if (!bloque) return notFound()
 
-  return <EliminarBloqueForm bloque={bloque} />
+  return <EliminarBloqueForm bloque={{ ...bloque, memberCount: (bloque as any).members?.length ?? 0 } as any} />
 }

@@ -150,7 +150,7 @@ export default function GruposPage() {
 
   // Filtrar contactos disponibles para agregar
   const availableContacts = contacts.filter(contact =>
-    !groupMembers[showMembers]?.some(m => m.contactId === contact.id) &&
+    !groupMembers[showMembers ?? 0]?.some((m: any) => m.contactId === contact.id) &&
     (contact.name.toLowerCase().includes(addMemberSearch.toLowerCase()) ||
      contact.email.toLowerCase().includes(addMemberSearch.toLowerCase()))
   )
@@ -313,9 +313,9 @@ export default function GruposPage() {
           </div>
 
           <div className="space-y-4">
-            {groupMembers[showMembers]?.length > 0 ? (
+            {(groupMembers[showMembers ?? 0] ?? []).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {groupMembers[showMembers].map(member => (
+                {(groupMembers[showMembers ?? 0] ?? []).map((member: any) => (
                   <div key={member.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm truncate">{member.contact.name}</div>

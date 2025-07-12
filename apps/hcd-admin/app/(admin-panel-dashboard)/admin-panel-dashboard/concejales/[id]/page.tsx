@@ -19,9 +19,9 @@ export default async function EditConcejalPage({ params }: { params: { id: strin
   // Mapear campos snake_case a camelCase
   const concejalMapped = {
     ...concejal,
-    seniorPosition: concejal.seniorPosition || concejal.senior_position || "",
-    blockId: concejal.blockId || concejal.block_id || "",
-    isActive: concejal.isActive ?? concejal.is_active ?? true,
+    seniorPosition: concejal.seniorPosition || (concejal as any).senior_position || "",
+    blockId: concejal.blockId || (concejal as any).block_id || "",
+    isActive: concejal.isActive ?? (concejal as any).is_active ?? true,
   }
 
   return (
