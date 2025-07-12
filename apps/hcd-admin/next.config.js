@@ -16,6 +16,4 @@ const nextConfig = {
   },
 };
 
-console.log("DATABASE_URL en build:", process.env.DATABASE_URL);
-
 export default nextConfig;
