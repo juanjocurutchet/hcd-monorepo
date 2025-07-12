@@ -3,19 +3,66 @@
 import type { CouncilMember, PoliticalBlockWithPresident } from "@/actions/council-actions";
 import { useApiRequest } from "@/hooks/useApiRequest"; // ✅ Importar hook
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ConcejalFormProps {
   bloques: PoliticalBlockWithPresident[]
   concejal?: CouncilMember | null
+  onConcejalUpdated?: (concejal: CouncilMember) => void
 }
 
-export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
+export default function ConcejalForm({ concejal, bloques, onConcejalUpdated }: ConcejalFormProps) {
+  console.log("concejal recibido en el form:", concejal);
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const router = useRouter()
   const { apiRequest, isAuthenticated } = useApiRequest() // ✅ Usar hook
+
+  // Estado controlado para el formulario
+  const [formData, setFormData] = useState({
+    name: concejal?.name || "",
+    position: concejal?.position || "concejal",
+    seniorPosition: concejal?.seniorPosition || "",
+    blockId: concejal?.blockId?.toString() || "-1",
+    mandate: concejal?.mandate || "",
+    bio: concejal?.bio || "",
+    isActive: concejal?.isActive ?? true,
+  })
+
+  // Actualizar el estado cuando cambie el concejal
+  useEffect(() => {
+    console.log("Concejal actualizado en useEffect:", concejal)
+    if (concejal) {
+      const newFormData = {
+        name: concejal.name || "",
+        position: concejal.position || "concejal",
+        seniorPosition: concejal.seniorPosition || "",
+        blockId: concejal.blockId?.toString() || "-1",
+        mandate: concejal.mandate || "",
+        bio: concejal.bio || "",
+        isActive: concejal.isActive ?? true,
+      }
+      console.log("Nuevo formData:", newFormData)
+      setFormData(newFormData)
+    }
+  }, [concejal])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }))
+  }
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -30,21 +77,40 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
     setError("")
     setSuccess("")
 
-    const formData = new FormData(e.currentTarget)
+    const submitFormData = new FormData()
+    submitFormData.append("name", formData.name)
+    submitFormData.append("position", formData.position)
+    submitFormData.append("seniorPosition", formData.seniorPosition)
+    submitFormData.append("blockId", formData.blockId === "-1" ? "" : formData.blockId)
+    submitFormData.append("mandate", formData.mandate)
+    submitFormData.append("bio", formData.bio)
+    submitFormData.append("isActive", formData.isActive.toString())
+
+    // Agregar imagen si existe
+    const imageInput = e.currentTarget.querySelector('input[name="image"]') as HTMLInputElement
+    if (imageInput?.files?.[0]) {
+      submitFormData.append("image", imageInput.files[0])
+    }
+
     const url = concejal?.id ? `/api/council-members/${concejal.id}` : "/api/council-members"
     const method = concejal?.id ? "PUT" : "POST"
 
     try {
       // ✅ Usar hook en lugar de fetch manual
-      await apiRequest(url, {
+      const result = await apiRequest(url, {
         method,
-        body: formData,
+        body: submitFormData,
         headers: {} // Vacío para FormData
       })
 
       setSuccess(concejal ? "Concejal actualizado correctamente" : "Concejal creado correctamente")
-      window.location.href = "/admin-panel/concejales"
+
+      // Redirigir después de un breve delay para mostrar el mensaje de éxito
+      setTimeout(() => {
+        window.location.href = "/admin-panel-dashboard/concejales"
+      }, 1500)
       router.refresh()
+      onConcejalUpdated?.(result || concejal!) // Llamar a la función de actualización
     } catch (err: any) {
       console.error("Error:", err)
       setError(err.message || "Error desconocido")
@@ -71,7 +137,8 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
           id="name"
           name="name"
           required
-          defaultValue={concejal?.name || ""}
+          value={formData.name}
+          onChange={handleChange}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         />
       </div>
@@ -81,7 +148,8 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
         <select
           id="position"
           name="position"
-          defaultValue={concejal?.position || "concejal"}
+          value={formData.position}
+          onChange={handleChange}
           className="mt-1 block w-full border rounded-md px-3 py-2"
           required
         >
@@ -95,7 +163,8 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
         <select
           id="seniorPosition"
           name="seniorPosition"
-          defaultValue={concejal?.seniorPosition || ""}
+          value={formData.seniorPosition}
+          onChange={handleChange}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         >
           <option value="">Sin cargo superior</option>
@@ -110,7 +179,8 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
         <select
           id="blockId"
           name="blockId"
-          defaultValue={concejal?.blockId?.toString() || "-1"}
+          value={formData.blockId}
+          onChange={handleChange}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         >
           <option value="-1">Sin bloque asignado</option>
@@ -126,7 +196,8 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
           type="text"
           id="mandate"
           name="mandate"
-          defaultValue={concejal?.mandate || ""}
+          value={formData.mandate}
+          onChange={handleChange}
           className="mt-1 block w-full border rounded-md px-3 py-2"
         />
       </div>
@@ -136,7 +207,8 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
         <textarea
           id="bio"
           name="bio"
-          defaultValue={concejal?.bio || ""}
+          value={formData.bio}
+          onChange={handleChange}
           className="mt-1 block w-full border rounded-md px-3 py-2"
           rows={4}
         />
@@ -155,16 +227,11 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
 
       <div className="flex items-center">
         <input
-          type="hidden"
-          name="isActive"
-          value="false"
-        />
-        <input
           type="checkbox"
           id="isActive"
           name="isActive"
-          value="true"
-          defaultChecked={concejal?.isActive ?? true}
+          checked={formData.isActive}
+          onChange={handleCheckboxChange}
           className="h-4 w-4 text-blue-600 border-gray-300 rounded"
         />
         <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">Activo</label>

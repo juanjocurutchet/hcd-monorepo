@@ -1,5 +1,5 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 const ROLES = [
@@ -20,14 +20,27 @@ export default function UsuariosTableClient() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const router = useRouter()
+  const pathname = usePathname()
 
   async function fetchUsuarios() {
     setLoading(true)
+    console.log("[UsuariosTableClient] Iniciando fetchUsuarios...")
     try {
-      const res = await fetch("/api/users", { cache: "no-store" })
+      const res = await fetch("/api/users", {
+        cache: "no-store",
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
       const data = await res.json()
-      setUsuarios(data)
-    } catch {
+      console.log("[UsuariosTableClient] Datos recibidos:", data)
+      // Ahora data es un array de usuarios directamente
+      const usuariosArray = Array.isArray(data) ? data : [];
+      setUsuarios(usuariosArray)
+    } catch (error) {
+      console.error("[UsuariosTableClient] Error al fetch:", error)
       setUsuarios([])
     } finally {
       setLoading(false)
@@ -37,6 +50,35 @@ export default function UsuariosTableClient() {
   useEffect(() => {
     fetchUsuarios()
   }, [])
+
+  // Actualizar cuando se regrese a la página de usuarios
+  useEffect(() => {
+    if (pathname === "/admin-panel-dashboard/usuarios") {
+      fetchUsuarios()
+    }
+  }, [pathname])
+
+  // Forzar actualización cuando se regrese a la página
+  useEffect(() => {
+    const handleFocus = () => {
+      if (pathname === "/admin-panel-dashboard/usuarios") {
+        fetchUsuarios()
+      }
+    }
+
+    const handlePopState = () => {
+      if (pathname === "/admin-panel-dashboard/usuarios") {
+        fetchUsuarios()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [pathname])
 
   const handleDelete = async (userId: number) => {
     setShowDeleteModal(false)
@@ -151,7 +193,7 @@ export default function UsuariosTableClient() {
             <p>¿Deseas editar a <b>{selectedUser?.name}</b>?</p>
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded">Cancelar</button>
-              <button onClick={() => { setShowEditModal(false); router.push(`/admin-panel/usuarios/${selectedUser.id}`) }} className="px-4 py-2 bg-blue-600 text-white rounded">Editar</button>
+              <button onClick={() => { setShowEditModal(false); router.push(`/admin-panel-dashboard/usuarios/${selectedUser.id}`) }} className="px-4 py-2 bg-blue-600 text-white rounded">Editar</button>
             </div>
           </div>
         </div>

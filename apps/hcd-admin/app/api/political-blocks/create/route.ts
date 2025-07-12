@@ -33,6 +33,10 @@ export async function POST(request: NextRequest) {
       })
       .returning()
 
+    if (!nuevoBloque) {
+      return NextResponse.json({ error: "Error al crear el bloque" }, { status: 500 })
+    }
+
     // Asignar miembros al bloque
     if (miembros.length > 0) {
       await db

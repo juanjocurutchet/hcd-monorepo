@@ -24,6 +24,7 @@ interface Comision {
   description?: string;
   presidentId?: string | number;
   secretaryId?: string | number; // ✅ Añadir secretario
+  secretaryHcdId?: string | number; // ✅ Añadir secretario HCD
   isActive?: boolean;
   members?: { id: string | number }[];
 }
@@ -137,8 +138,8 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
   const allMemberOptions = [
     ...concejales,
     ...((comision?.members || []).filter(
-      m => !concejales.some(c => c.id.toString() === m.id.toString())
-    ))
+      m => !concejales.some(c => c.id.toString() === m.id.toString()) && 'name' in m
+    ) as { id: string | number; name: string }[])
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

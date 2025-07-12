@@ -34,7 +34,7 @@ export default function EliminarBloqueForm({ bloque }: EliminarBloqueFormProps) 
         method: "DELETE",
       })
 
-      window.location.href = '/admin-panel/bloques'
+      window.location.href = '/admin-panel-dashboard/bloques'
     } catch (error: any) {
       console.error("Error:", error)
       setError(error.message || "Error desconocido")

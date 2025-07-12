@@ -129,7 +129,8 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario | null }) {
         throw new Error(errorData.error || "Error al guardar el usuario")
       }
 
-      router.push("/admin-panel/usuarios")
+      // Redireccionar a la lista de usuarios
+      router.push("/admin-panel-dashboard/usuarios")
       router.refresh()
     } catch (err) {
       if (err instanceof Error) {
@@ -154,7 +155,8 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario | null }) {
         const errorData = await response.json()
         throw new Error(errorData.error || "Error al eliminar el usuario")
       }
-      router.push("/admin-panel/usuarios")
+      // Redireccionar a la lista de usuarios
+      router.push("/admin-panel-dashboard/usuarios")
       router.refresh()
     } catch (err) {
       if (err instanceof Error) {
@@ -207,7 +209,8 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario | null }) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Error al guardar el usuario");
       }
-      router.push("/admin-panel/usuarios");
+      // Redireccionar a la lista de usuarios
+      router.push("/admin-panel-dashboard/usuarios");
       router.refresh();
     } catch (err) {
       if (err instanceof Error) {

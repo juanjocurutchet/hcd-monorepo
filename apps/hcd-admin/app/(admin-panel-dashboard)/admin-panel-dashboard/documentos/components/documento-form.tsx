@@ -204,7 +204,7 @@ export function DocumentoForm({ documento = null }: { documento?: any | null }) 
         const errorData = await response.json()
         throw new Error(errorData.error || "Error al guardar la ordenanza")
       }
-      router.push("/admin-panel/documentos")
+      router.push("/admin-panel-dashboard/documentos")
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido")
@@ -219,7 +219,7 @@ export function DocumentoForm({ documento = null }: { documento?: any | null }) 
     try {
       const res = await fetch(`/api/ordinances/${documento.id}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Error al eliminar la disposición")
-      router.push("/admin-panel/documentos")
+      router.push("/admin-panel-dashboard/documentos")
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido")

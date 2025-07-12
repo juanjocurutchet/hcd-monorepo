@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       countQuery = countQuery.replace(/ AND type ILIKE \$\d+/, '')
     }
     const countResult = await sql.query(countQuery, params);
-    const total = countResult && countResult[0] ? parseInt(countResult[0].count) : 0
+    const total = countResult && Array.isArray(countResult) && countResult[0] ? parseInt((countResult[0] as any).count) : 0
 
     // Agregar ordenamiento y paginación
     query += ` ORDER BY year DESC, approval_number DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`
@@ -135,7 +135,11 @@ export async function POST(request: NextRequest) {
       VALUES (${approval_number}, ${title}, ${year}, ${type}, ${category}, ${notes}, ${is_active}, ${file_url}, ${slug})
       RETURNING *
     `
-    const ordinance = result[0]
+    const ordinance = Array.isArray(result) ? result[0] as any : null
+
+    if (!ordinance) {
+      return NextResponse.json({ error: "Error al crear la ordenanza" }, { status: 500 })
+    }
 
     // Guardar relaciones modificatorias
     if (Array.isArray(modificadasIds) && modificadasIds.length > 0) {

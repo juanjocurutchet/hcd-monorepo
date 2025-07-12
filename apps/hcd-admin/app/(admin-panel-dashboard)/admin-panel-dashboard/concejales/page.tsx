@@ -36,7 +36,7 @@ export default function ConcejalesPage() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Concejales</h1>
-        <Link href="/admin-panel/concejales/nuevo" className="text-blue-600 hover:underline">
+        <Link href="/admin-panel-dashboard/concejales/nuevo" className="text-blue-600 hover:underline">
           Agregar concejal
         </Link>
       </div>
@@ -59,14 +59,14 @@ export default function ConcejalesPage() {
 
                   <div className="flex gap-2">
                     <Link
-                      href={`/admin-panel/concejales/${concejal.id}`}
+                      href={`/admin-panel-dashboard/concejales/${concejal.id}`}
                       className="text-blue-600 hover:underline"
                       prefetch={false}
                     >
                       Editar
                     </Link>
                     <Link
-                      href={`/admin-panel/concejales/${concejal.id}/eliminar`}
+                      href={`/admin-panel-dashboard/concejales/${concejal.id}/eliminar`}
                       className="text-red-600 hover:underline"
                       prefetch={false}
                     >

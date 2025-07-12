@@ -1,6 +1,7 @@
-import { getDocumentById } from "@/lib/services/document-service"
-import { notFound } from "next/navigation"
-import { DocumentoForm } from "../components/documento-form"
+import { getDocumentById } from "@/lib/services/document-service";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+import { DocumentoForm } from "../components/documento-form";
 
 interface PageProps {
   params: {
@@ -9,6 +10,7 @@ interface PageProps {
 }
 
 export default async function EditarDocumentoPage(props: PageProps) {
+  headers(); // Fuerza request fresh y sin cache
   const params = await props.params;
   const id = Number.parseInt(params.id)
   if (isNaN(id)) notFound()

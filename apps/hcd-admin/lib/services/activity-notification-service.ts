@@ -41,7 +41,7 @@ export class ActivityNotificationService {
       return { success: true, notified: activitiesToNotify.length }
     } catch (error) {
       console.error("Error enviando notificaciones de actividades:", error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
     }
   }
 
@@ -77,7 +77,7 @@ export class ActivityNotificationService {
         // Soporta formatos como "10_minutes", "1_hours", "1_days"
         let advanceMs = 0
         const match = advance.match(/(\d+)_?(minutes|hours|days)?/)
-        if (match) {
+        if (match && match[1]) {
           const value = parseInt(match[1])
           const unit = match[2] || 'hours'
           if (unit === 'minutes') advanceMs = value * 60 * 1000
@@ -105,7 +105,14 @@ export class ActivityNotificationService {
           (now.getTime() - lastNotification.getTime()) < (2 * 60 * 60 * 1000)
 
         if (shouldNotify && !recentlyNotified) {
-          activitiesNeedingNotification.push(activity)
+          activitiesNeedingNotification.push({
+            ...activity,
+            date: activity.date.toISOString(),
+            location: activity.location ?? undefined,
+            imageUrl: activity.imageUrl ?? undefined,
+            notificationEmails: activity.notificationEmails ?? undefined,
+            lastNotificationSent: activity.lastNotificationSent?.toISOString()
+          })
           break // Solo agregar una vez por actividad
         }
       }
@@ -292,13 +299,27 @@ Si tienes alguna pregunta, contacta al administrador del sistema.
         throw new Error('Actividad no encontrada')
       }
 
-      await this.sendActivityNotification(activity[0])
+      const activityData = activity[0]
+      if (!activityData) {
+        throw new Error('Actividad no encontrada')
+      }
+
+      const activityForNotification: Activity = {
+        ...activityData,
+        date: activityData.date.toISOString(),
+        location: activityData.location ?? undefined,
+        imageUrl: activityData.imageUrl ?? undefined,
+        notificationEmails: activityData.notificationEmails ?? undefined,
+        lastNotificationSent: activityData.lastNotificationSent?.toISOString()
+      }
+
+      await this.sendActivityNotification(activityForNotification)
       await this.markActivityAsNotified(activityId)
 
       return { success: true }
     } catch (error) {
       console.error('Error enviando notificación inmediata:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
     }
   }
 
@@ -317,9 +338,18 @@ Si tienes alguna pregunta, contacta al administrador del sistema.
         throw new Error('Actividad no encontrada')
       }
 
-      const testActivity = {
-        ...activity[0],
-        notificationEmails: testEmail
+      const activityData = activity[0]
+      if (!activityData) {
+        throw new Error('Actividad no encontrada')
+      }
+
+      const testActivity: Activity = {
+        ...activityData,
+        date: activityData.date.toISOString(),
+        location: activityData.location ?? undefined,
+        imageUrl: activityData.imageUrl ?? undefined,
+        notificationEmails: testEmail,
+        lastNotificationSent: activityData.lastNotificationSent?.toISOString()
       }
 
       await this.sendActivityNotification(testActivity)
@@ -327,7 +357,7 @@ Si tienes alguna pregunta, contacta al administrador del sistema.
       return { success: true }
     } catch (error) {
       console.error('Error en prueba de notificación:', error)
-      return { success: false, error: error.message }
+      return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' }
     }
   }
 }

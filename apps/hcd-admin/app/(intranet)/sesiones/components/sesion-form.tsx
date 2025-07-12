@@ -11,7 +11,7 @@ import { useApiRequest } from "@/hooks/useApiRequest"; // ✅ Importar hook
 import { AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { ChangeEvent, useState } from "react"
-import SessionProviderWrapper from "../../SessionProviderWrapper"
+import SessionProviderWrapper from "../../../admin-panel/SessionProviderWrapper"
 
 interface Sesion {
   id?: string;

@@ -10,7 +10,7 @@ export default async function SesionesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Sesiones</h1>
-        <Link href="/admin-panel/sesiones/nueva" className="text-blue-600 hover:underline">
+        <Link href="/admin-panel-dashboard/sesiones/nueva" className="text-blue-600 hover:underline">
           Agregar sesión
         </Link>
       </div>
@@ -52,7 +52,7 @@ export default async function SesionesPage() {
         <div className="text-center py-8 text-gray-500">
           <p>No hay sesiones creadas aún.</p>
           <Link
-            href="/admin-panel/sesiones/nueva"
+            href="/admin-panel-dashboard/sesiones/nueva"
             className="text-blue-600 hover:underline mt-2 inline-block"
           >
             Crear la primera sesión

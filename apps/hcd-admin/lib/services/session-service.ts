@@ -73,7 +73,18 @@ export async function getSessions(options: {
 
     const result = await sql.query(query, params)
     console.log("SESIONES EN DB:", result);
-    return result as Session[]
+
+    // Mapear los campos de snake_case a camelCase
+    return (result as any[]).map(session => ({
+      ...session,
+      isPublished: session.is_published,
+      agendaFileUrl: session.agenda_file_url,
+      minutesFileUrl: session.minutes_file_url,
+      audioFileUrl: session.audio_file_url,
+      videoUrl: session.video_url,
+      createdAt: session.created_at,
+      updatedAt: session.updated_at
+    })) as Session[]
   } catch (error) {
     console.error("Error fetching sessions:", error)
     return []
@@ -87,7 +98,20 @@ export async function getSessionById(id: number): Promise<Session | null> {
       FROM sessions
       WHERE id = ${id}
     `
-    return result[0] || null
+    if (Array.isArray(result) && result[0]) {
+      const session = result[0] as any;
+      return {
+        ...session,
+        isPublished: session.is_published,
+        agendaFileUrl: session.agenda_file_url,
+        minutesFileUrl: session.minutes_file_url,
+        audioFileUrl: session.audio_file_url,
+        videoUrl: session.video_url,
+        createdAt: session.created_at,
+        updatedAt: session.updated_at
+      } as Session;
+    }
+    return null;
   } catch (error) {
     console.error("Error getting session by id:", error)
     return null
@@ -155,7 +179,20 @@ export async function updateSession(session: {
       RETURNING *
     `
 
-    return updated[0]
+    if (Array.isArray(updated) && updated[0]) {
+      const sessionData = updated[0] as any;
+      return {
+        ...sessionData,
+        isPublished: sessionData.is_published,
+        agendaFileUrl: sessionData.agenda_file_url,
+        minutesFileUrl: sessionData.minutes_file_url,
+        audioFileUrl: sessionData.audio_file_url,
+        videoUrl: sessionData.video_url,
+        createdAt: sessionData.created_at,
+        updatedAt: sessionData.updated_at
+      } as Session;
+    }
+    return null;
   } catch (error) {
     console.error("Error updating session:", error)
     throw error
@@ -222,7 +259,20 @@ export async function createSession(session: {
       RETURNING *
     `
 
-    return result[0]
+    if (Array.isArray(result) && result[0]) {
+      const sessionData = result[0] as any;
+      return {
+        ...sessionData,
+        isPublished: sessionData.is_published,
+        agendaFileUrl: sessionData.agenda_file_url,
+        minutesFileUrl: sessionData.minutes_file_url,
+        audioFileUrl: sessionData.audio_file_url,
+        videoUrl: sessionData.video_url,
+        createdAt: sessionData.created_at,
+        updatedAt: sessionData.updated_at
+      } as Session;
+    }
+    return null;
   } catch (error) {
     console.error("Error creating session:", error)
     throw error

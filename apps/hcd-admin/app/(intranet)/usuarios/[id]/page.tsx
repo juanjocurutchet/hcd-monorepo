@@ -1,7 +1,8 @@
-import { notFound } from "next/navigation"
+import { notFound } from "next/navigation";
 
-import { getUserById } from "@/lib/services/user-service"
-import { UsuarioForm } from "../components/usuario-form"
+import { getUserById } from "@/lib/services/user-service";
+import { headers } from "next/headers";
+import { UsuarioForm } from "../components/usuario-form";
 
 interface PageProps {
   params: {
@@ -10,6 +11,7 @@ interface PageProps {
 }
 
 export default async function EditarUsuarioPage({ params }: PageProps) {
+  headers(); // Fuerza request fresh y sin cache
   const id = Number.parseInt(params.id)
   if (isNaN(id)) notFound()
 

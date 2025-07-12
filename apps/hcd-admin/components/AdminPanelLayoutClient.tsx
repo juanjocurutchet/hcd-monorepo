@@ -19,8 +19,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { ReactNode } from "react"
 import Image from "next/image"
+import { ReactNode } from "react"
 
 export default function AdminPanelLayoutClient({ children }: { children: ReactNode }) {
   const pathname = usePathname()
@@ -88,16 +88,18 @@ export default function AdminPanelLayoutClient({ children }: { children: ReactNo
           <nav className="flex-1 px-2 py-4 overflow-y-auto">
             <ul className="space-y-1">
               {/* Botón de ir a la intranet separado visualmente */}
-              <li className="mb-4">
-                <Link
-                  href={navItems[0].href}
-                  prefetch={true}
-                  className={`flex items-center px-4 py-2 text-base font-semibold rounded-md bg-[#e6f0fa] text-[#0e4c7d] hover:bg-[#d0e3f7] transition`}
-                >
-                  {navItems[0].icon}
-                  <span className="ml-3">{navItems[0].name}</span>
-                </Link>
-              </li>
+              {navItems[0] && (
+                <li className="mb-4">
+                  <Link
+                    href={navItems[0].href}
+                    prefetch={true}
+                    className={`flex items-center px-4 py-2 text-base font-semibold rounded-md bg-[#e6f0fa] text-[#0e4c7d] hover:bg-[#d0e3f7] transition`}
+                  >
+                    {navItems[0].icon}
+                    <span className="ml-3">{navItems[0].name}</span>
+                  </Link>
+                </li>
+              )}
               {/* Resto de los botones */}
               {navItems.slice(1).map((item) => (
                 <li key={item.name}>

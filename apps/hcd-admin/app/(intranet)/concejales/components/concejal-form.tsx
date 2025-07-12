@@ -43,7 +43,7 @@ export default function ConcejalForm({ concejal, bloques }: ConcejalFormProps) {
       })
 
       setSuccess(concejal ? "Concejal actualizado correctamente" : "Concejal creado correctamente")
-      window.location.href = "/admin-panel/concejales"
+      window.location.href = "/admin-panel-dashboard/concejales"
       router.refresh()
     } catch (err: any) {
       console.error("Error:", err)

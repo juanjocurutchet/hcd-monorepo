@@ -29,7 +29,7 @@ export default function BloquesListPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Bloques</h1>
         <Link
-          href="/admin-panel/bloques/nuevo"
+          href="/admin-panel-dashboard/bloques/nuevo"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Crear nuevo bloque
@@ -46,7 +46,7 @@ export default function BloquesListPage() {
               className="flex justify-between items-center p-4 bg-white shadow rounded border border-gray-200 hover:bg-gray-50 transition cursor-pointer"
             >
               <Link
-                href={`/admin-panel/bloques/${bloque.id}`}
+                href={`/admin-panel-dashboard/bloques/${bloque.id}`}
                 className="flex-1 flex items-center space-x-4 min-w-0"
                 prefetch={false}
                 style={{ textDecoration: 'none' }}
@@ -78,7 +78,7 @@ export default function BloquesListPage() {
               </Link>
               <div className="flex space-x-2 ml-4">
                 <Link
-                  href={`/admin-panel/bloques/${bloque.id}/eliminar`}
+                  href={`/admin-panel-dashboard/bloques/${bloque.id}/eliminar`}
                   className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
                 >
                   Eliminar

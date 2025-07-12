@@ -1,5 +1,5 @@
 
-import { db } from '../lib/db-singleton.ts';
+import { db } from '../lib/db-singleton';
 
 async function applyMigration() {
   try {

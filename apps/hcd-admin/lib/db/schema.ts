@@ -12,8 +12,8 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: varchar("role", { length: 50 }).default("editor").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 })
 
 export const news = pgTable("news", {
@@ -213,6 +213,8 @@ export const ordinances = pgTable('ordinances', {
   category: text('category').notNull(),
   notes: text('notes'),
   is_active: boolean('is_active').default(true),
+  derogada_por: integer('derogada_por'),
+  is_modifies: boolean('is_modifies'),
   file_url: text('file_url'),
   slug: text('slug').unique(),
   created_at: timestamp('created_at').defaultNow(),
@@ -354,3 +356,13 @@ export const contactGroupMembersRelations = relations(contactGroupMembers, ({ on
     references: [contactGroups.id],
   }),
 }))
+
+export const modificatorias_tmp_backup = pgTable("modificatorias_tmp_backup", {
+  idmodif: integer("idmodif"),
+  idord: integer("idord"),
+  numaprob: integer("numaprob"),
+  nombre: text("nombre"),
+  año: integer("año"),
+  observaciones: text("observaciones"),
+  ordenanza: integer("ordenanza"),
+});

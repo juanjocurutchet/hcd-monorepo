@@ -1,12 +1,14 @@
-import { notFound } from "next/navigation"
-import { getSessionById } from "@/lib/services/session-service"
-import { SesionForm } from "../components/sesion-form"
+import { getSessionById } from "@/lib/services/session-service";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+import { SesionForm } from "../components/sesion-form";
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function EditarSesionPage({ params }: PageProps) {
+  headers(); // Fuerza request fresh y sin cache
   const { id } = await params
   const numericId = Number.parseInt(id)
   if (isNaN(numericId)) notFound()

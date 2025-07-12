@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
-import { formatDate } from "@/lib/utils/format" // ✅ Usar tu función existente
+import { Button } from "@/components/ui/button"
 import { useApiRequest } from "@/hooks/useApiRequest"
+import { formatDate } from "@/lib/utils/format"; // ✅ Usar tu función existente
+import { AlertCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface EliminarSesionFormProps {
   sesion: {
@@ -42,7 +42,7 @@ export default function EliminarSesionForm({ sesion }: EliminarSesionFormProps) 
         method: "DELETE"
       })
 
-      router.push("/admin-panel/sesiones")
+      router.push("/admin-panel-dashboard/sesiones")
       router.refresh()
     } catch (err: any) {
       console.error("Error:", err)

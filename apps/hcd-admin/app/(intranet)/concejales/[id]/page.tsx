@@ -1,8 +1,10 @@
-import { getAllPoliticalBlocksWithPresident, getCouncilMemberById } from "@/actions/council-actions"
-import { notFound } from "next/navigation"
-import ConcejalForm from "../components/concejal-form"
+import { getAllPoliticalBlocksWithPresident, getCouncilMemberById } from "@/actions/council-actions";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+import ConcejalForm from "../components/concejal-form";
 
 export default async function EditConcejalPage({ params }: { params: { id: string } }) {
+  headers(); // Fuerza request fresh y sin cache
   const { id } = await params // Asegurarse de esperar `params`
   const numericId = Number(id)
   if (!numericId || isNaN(numericId)) return notFound()

@@ -1,22 +1,18 @@
 "use client"
 
+import type { CouncilMember } from "@/actions/council-actions"
 import { useApiRequest } from "@/hooks/useApiRequest"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import BloqueForm from "../components/bloque-form"
 
-interface CouncilMember {
-  id: number
-  name: string
-  position: string | null
-  seniorPosition: string | null
-  imageUrl: string | null
-  createdAt: string
-  updatedAt: string
-  blockId: number | null
-  mandate: string | null
-  bio: string | null
-  isActive: boolean
+// Función para convertir fechas de string a Date
+function convertCouncilMemberDates(member: any): CouncilMember {
+  return {
+    ...member,
+    createdAt: new Date(member.createdAt),
+    updatedAt: new Date(member.updatedAt)
+  }
 }
 
 interface BloqueData {
@@ -71,7 +67,15 @@ export default function EditBloquePage({ params }: { params: Promise<{ id: strin
 
         const bloqueData = await bloqueResponse.json()
         console.log("Datos del bloque recibidos:", bloqueData)
-        setBloque(bloqueData)
+
+        // Convertir fechas de string a Date
+        const bloqueConvertido = {
+          ...bloqueData,
+          president: bloqueData.president ? convertCouncilMemberDates(bloqueData.president) : null,
+          members: bloqueData.members ? bloqueData.members.map(convertCouncilMemberDates) : []
+        }
+
+        setBloque(bloqueConvertido)
 
         // Cargar todos los concejales activos
         console.log("Cargando concejales")
@@ -92,7 +96,10 @@ export default function EditBloquePage({ params }: { params: Promise<{ id: strin
 
         const concejalesData = await concejalesResponse.json()
         console.log("Datos de concejales recibidos:", concejalesData.length, "concejales")
-        setConcejales(concejalesData)
+
+        // Convertir fechas de concejales
+        const concejalesConvertidos = concejalesData.map(convertCouncilMemberDates)
+        setConcejales(concejalesConvertidos)
 
         setDataLoaded(true)
       } catch (error) {

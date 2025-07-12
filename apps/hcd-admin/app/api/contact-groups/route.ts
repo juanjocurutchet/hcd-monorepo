@@ -18,7 +18,7 @@ export async function GET() {
 
     // Para cada grupo, obtener el conteo de miembros
     const groupsWithMembers = await Promise.all(
-      allGroups.map(async (group) => {
+      allGroups.map(async (group: { id: number; name: string; description: string | null; createdAt: Date; updatedAt: Date }) => {
         const memberCount = await db
           .select({ count: sql`count(*)` })
           .from(contactGroupMembers)

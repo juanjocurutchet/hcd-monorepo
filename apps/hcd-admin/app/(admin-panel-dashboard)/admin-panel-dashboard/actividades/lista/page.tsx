@@ -110,14 +110,14 @@ export default function ListaActividadesPage() {
         <h1 className="text-3xl font-bold text-gray-900">Lista de Actividades</h1>
         <div className="flex space-x-4">
           <Link
-            href="/admin-panel/actividades"
+            href="/admin-panel-dashboard/actividades"
             className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             <Calendar className="w-4 h-4 mr-2" />
             Vista Calendario
           </Link>
           <Link
-            href="/admin-panel/actividades/nueva"
+            href="/admin-panel-dashboard/actividades/nueva"
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -176,7 +176,7 @@ export default function ListaActividadesPage() {
               {filter === 'draft' && 'No hay borradores de actividades.'}
             </p>
             <Link
-              href="/admin-panel/actividades/nueva"
+              href="/admin-panel-dashboard/actividades/nueva"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -228,7 +228,7 @@ export default function ListaActividadesPage() {
                     {activity.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                   <Link
-                    href={`/admin-panel/actividades/${activity.id}/editar`}
+                    href={`/admin-panel-dashboard/actividades/${activity.id}/editar`}
                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg"
                     title="Editar"
                   >

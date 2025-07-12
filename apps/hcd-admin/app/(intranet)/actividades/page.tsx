@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useEffect, useState } from "react"
+import ActivityCard from "../../../components/ActivityCard"
 import DayView from "./components/DayView"
 import NotificationManager from "./components/NotificationManager"
 import WeekView from "./components/WeekView"
@@ -22,6 +23,7 @@ export default function ActividadesPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [view, setView] = useState<'month' | 'week' | 'day'>('month')
   const [loading, setLoading] = useState(true)
+  const [showList, setShowList] = useState(false)
 
   useEffect(() => {
     fetchActivities()
@@ -168,36 +170,65 @@ export default function ActividadesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-8">
             {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Calendario de Actividades</h1>
-        {/* Botones de vista lista y nueva actividad eliminados */}
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
+          onClick={() => setShowList((v) => !v)}
+        >
+          {showList ? "Ver calendario" : "Ver lista"}
+        </button>
       </div>
 
-      {/* Calendar Controls */}
-      <div className="bg-white p-4 rounded-lg shadow border">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => navigateMonth('prev')}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <h2 className="text-xl font-semibold">
-              {currentDate.toLocaleDateString('es-ES', {
-                month: 'long',
-                year: 'numeric'
-              })}
-            </h2>
-            <button
-              onClick={() => navigateMonth('next')}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+      {showList ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {activities.length === 0 ? (
+            <div className="col-span-full text-center text-gray-500 py-16">No hay actividades programadas.</div>
+          ) : (
+            activities.map((activity, i) => (
+              <ActivityCard
+                key={activity.id}
+                activity={{
+                  id: activity.id,
+                  title: activity.title,
+                  description: activity.description,
+                  location: activity.location,
+                  date: activity.date,
+                  isPublished: activity.isPublished,
+                  responsible: "",
+                  attachmentUrl: "",
+                  imageUrl: activity.imageUrl,
+                }}
+                isNext={i === 0}
+              />
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="bg-white p-4 rounded-lg shadow border">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigateMonth('prev')}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-xl font-semibold">
+                {currentDate.toLocaleDateString('es-ES', {
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </h2>
+              <button
+                onClick={() => navigateMonth('next')}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
 
           <div className="flex space-x-2">
             <button
@@ -233,7 +264,7 @@ export default function ActividadesPage() {
           </div>
         </div>
 
-                {/* Calendar Views */}
+        {/* Calendar Views */}
         {view === 'month' && (
           <div className="grid grid-cols-7 gap-1">
             {/* Day Headers */}
@@ -307,6 +338,7 @@ export default function ActividadesPage() {
           />
         )}
       </div>
+    )}
 
       {/* Selected Date Info */}
       {selectedDate && (

@@ -1,7 +1,7 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 interface Props {
   usuario: {
@@ -15,13 +15,13 @@ export default function EliminarUsuarioForm({ usuario }: Props) {
 
   const handleDelete = async () => {
     try {
-      await fetch(`/api/usuarios/${usuario.id}`, {
+      await fetch(`/api/users/${usuario.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       })
-      router.push("/admin-panel/usuarios")
+      router.push("/admin-panel-dashboard/usuarios")
     } catch (error) {
       console.error("Error al eliminar usuario:", error)
     }

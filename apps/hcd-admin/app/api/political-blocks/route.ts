@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     // Para cada bloque, traer presidente y contar miembros activos
     const blocksWithDetails = await Promise.all(
-      blocks.map(async (block) => {
+      blocks.map(async (block: any) => {
         let president = null
         if (block.presidentId !== null) {
           const result = await db

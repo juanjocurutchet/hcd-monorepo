@@ -43,7 +43,7 @@ export default function EliminarConcejalForm({ concejal }: EliminarConcejalFormP
         throw new Error(errorData.error || "Error al eliminar el concejal")
       }
 
-      window.location.href = "/admin-panel/concejales"
+      window.location.href = "/admin-panel-dashboard/concejales"
     } catch (err) {
       console.error("Error al eliminar concejal:", err)
       setError("No se pudo eliminar el concejal.")

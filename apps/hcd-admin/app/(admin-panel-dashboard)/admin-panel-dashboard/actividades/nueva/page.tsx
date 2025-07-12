@@ -49,6 +49,13 @@ export default function NuevaActividadPage() {
       // Combinar fecha y hora en local (Argentina)
       const [year, month, day] = form.date.split('-').map(Number)
       const [hour, minute] = form.time.split(':').map(Number)
+
+      // Validar que todos los valores sean números válidos
+      if (!year || !month || !day || hour === undefined || minute === undefined) {
+        setError('Fecha u hora inválida')
+        return
+      }
+
       const dateTime = new Date(year, month - 1, day, hour, minute)
 
       const activityData = {
@@ -73,7 +80,7 @@ export default function NuevaActividadPage() {
       })
 
       if (response.ok) {
-        router.push('/admin-panel/actividades')
+        router.push('/admin-panel-dashboard/actividades')
       } else {
         const data = await response.json()
         setError(data.error || 'Error al crear la actividad')

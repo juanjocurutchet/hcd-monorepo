@@ -32,7 +32,7 @@ export async function GET(
 
     // Traer el secretario/a del HCD si está presente
     let secretaryHcd = null
-    if (comision.secretaryHcdId) {
+    if (comision && comision.secretaryHcdId) {
       const staffResult = await db.select().from(staff).where(eq(staff.id, comision.secretaryHcdId)).limit(1)
       if (staffResult.length > 0) {
         secretaryHcd = staffResult[0]

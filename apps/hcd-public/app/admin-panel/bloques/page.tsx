@@ -12,7 +12,7 @@ export default async function BloquesListPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Bloques</h1>
         <Link
-          href="/admin-panel/bloques/nuevo"
+          href="/admin-panel-dashboard/bloques/nuevo"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Crear nuevo bloque

@@ -20,12 +20,25 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Convertir la fecha string a objeto Date
+    // Filtrar solo los campos válidos para la tabla
     const activityData = {
-      ...body,
+      title: body.title,
+      description: body.description,
+      location: body.location || null,
       date: new Date(body.date),
+      imageUrl: body.imageUrl || null,
+      isPublished: body.isPublished ?? true,
+      enableNotifications: body.enableNotifications ?? true,
+      notificationAdvance: body.notificationAdvance ?? "24",
+      notificationEmails: body.notificationEmails || null,
+      lastNotificationSent: null,
       createdAt: new Date(),
       updatedAt: new Date()
+    }
+
+    // Validar campos obligatorios
+    if (!activityData.title || !activityData.description || !activityData.date) {
+      return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 })
     }
 
     const [newActivity] = await db.insert(activities).values(activityData).returning()

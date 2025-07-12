@@ -20,7 +20,7 @@ export default async function UsuariosPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Usuarios</h1>
-        <Link href="/admin-panel/usuarios/nuevo" className="text-blue-600 hover:underline">
+        <Link href="/admin-panel-dashboard/usuarios/nuevo" className="text-blue-600 hover:underline">
           Agregar usuario
         </Link>
       </div>

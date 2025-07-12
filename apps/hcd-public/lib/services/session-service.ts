@@ -1,11 +1,11 @@
 "use server"
 
+import { PoliticalBlockWithPresident } from "@/actions/council-actions"
 import { sql } from "@/lib/db"
 import { desc } from "drizzle-orm"
-import { sessions } from "../db/schema"
 import { db } from "../db-singleton"
+import { sessions } from "../db/schema"
 import { uploadFile } from "../storage"
-import { PoliticalBlockWithPresident } from "@/actions/council-actions"
 
 export type CouncilMember = {
   id: number
@@ -132,7 +132,7 @@ export async function getAllPoliticalBlocks(): Promise<PoliticalBlockWithPreside
     `
 
     const blocksWithPresidents = await Promise.all(
-      (blocks as any[]).map(async (block) => {
+      (blocks as any[]).map(async (block: any) => {
         const countResult = await sql`
           SELECT COUNT(*) as count
           FROM council_members

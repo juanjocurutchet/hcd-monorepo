@@ -9,7 +9,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { name, description, isActive } = body
+    const { name, description } = body
 
     if (!name) {
       return NextResponse.json(
@@ -23,7 +23,6 @@ export async function PUT(
       .set({
         name,
         description: description || null,
-        isActive: isActive !== undefined ? isActive : true,
         updatedAt: new Date(),
       })
       .where(eq(contactGroups.id, parseInt(params.id)))

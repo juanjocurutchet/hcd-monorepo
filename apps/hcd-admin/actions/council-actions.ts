@@ -97,7 +97,7 @@ export async function getAllPoliticalBlocksWithPresident(): Promise<PoliticalBlo
       .orderBy(asc(politicalBlocks.name))
 
     const blocksWithDetails = await Promise.all(
-      blocks.map(async (block) => {
+      blocks.map(async (block: { id: number; name: string; presidentId: number | null; color: string | null; description: string | null }) => {
         let president: CouncilMember | null = null
 
         if (block.presidentId !== null) {
@@ -197,4 +197,75 @@ export async function getCouncilMemberById(id: number): Promise<CouncilMember | 
   }
 }
 
-// ... resto del archivo ...
+export async function getPoliticalBlockById(id: number) {
+  try {
+    // Obtener el bloque
+    const blockResult = await db
+      .select({
+        id: politicalBlocks.id,
+        name: politicalBlocks.name,
+        presidentId: politicalBlocks.presidentId,
+        color: politicalBlocks.color,
+        description: politicalBlocks.description,
+      })
+      .from(politicalBlocks)
+      .where(eq(politicalBlocks.id, id))
+      .limit(1)
+
+    if (!blockResult[0]) return null
+    const block = blockResult[0]
+
+    // Obtener presidente
+    let president = null
+    if (block.presidentId) {
+      const presidentResult = await db
+        .select({
+          id: councilMembers.id,
+          name: councilMembers.name,
+          position: councilMembers.position,
+          seniorPosition: councilMembers.seniorPosition,
+          imageUrl: councilMembers.imageUrl,
+          createdAt: councilMembers.createdAt,
+          updatedAt: councilMembers.updatedAt,
+          blockId: councilMembers.blockId,
+          mandate: councilMembers.mandate,
+          bio: councilMembers.bio,
+          isActive: councilMembers.isActive,
+        })
+        .from(councilMembers)
+        .where(eq(councilMembers.id, block.presidentId))
+        .limit(1)
+      president = presidentResult[0] || null
+    }
+
+    // Obtener miembros activos
+    const members = await db
+      .select({
+        id: councilMembers.id,
+        name: councilMembers.name,
+        position: councilMembers.position,
+        seniorPosition: councilMembers.seniorPosition,
+        imageUrl: councilMembers.imageUrl,
+        createdAt: councilMembers.createdAt,
+        updatedAt: councilMembers.updatedAt,
+        blockId: councilMembers.blockId,
+        mandate: councilMembers.mandate,
+        bio: councilMembers.bio,
+        isActive: councilMembers.isActive,
+      })
+      .from(councilMembers)
+      .where(and(eq(councilMembers.blockId, id), eq(councilMembers.isActive, true)))
+
+    return {
+      id: block.id,
+      name: block.name,
+      color: block.color,
+      description: block.description,
+      president,
+      members,
+    }
+  } catch (error) {
+    console.error("Error al obtener bloque por id:", error)
+    return null
+  }
+}

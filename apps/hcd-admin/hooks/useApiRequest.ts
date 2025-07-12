@@ -25,7 +25,17 @@ export function useApiRequest() {
       throw new Error(errorData.error || `Error ${response.status}`)
     }
 
-    return response
+    // Intentar parsear la respuesta como JSON
+    try {
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        return await response.json()
+      }
+      return await response.text()
+    } catch (error) {
+      // Si no se puede parsear como JSON, devolver el texto
+      return await response.text()
+    }
   }
 
   return { apiRequest, isAuthenticated: status === "authenticated" }

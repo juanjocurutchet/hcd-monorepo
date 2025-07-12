@@ -1,12 +1,14 @@
-import { getCommissionById } from "@/lib/services/commission-service"
-import { notFound } from "next/navigation"
-import { ComisionForm } from "../components/comision-form"
+import { getCommissionById } from "@/lib/services/commission-service";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
+import { ComisionForm } from "../components/comision-form";
 
 interface PageProps {
   params: Promise<{ id: string }> // ✅ Cambiar a Promise
 }
 
 export default async function EditarComisionPage({ params }: PageProps) {
+  headers(); // Fuerza request fresh y sin cache
   const { id } = await params // ✅ Await params
   const numericId = Number.parseInt(id)
   if (isNaN(numericId)) notFound()
@@ -29,17 +31,13 @@ export default async function EditarComisionPage({ params }: PageProps) {
             description: comision.description ?? undefined,
             presidentId: comision.presidentId ? String(comision.presidentId) : undefined,
             secretaryId: comision.secretaryId ? String(comision.secretaryId) : undefined,
-            members: Array.isArray(comision.miembros)
-              ? comision.miembros.map((m: any) => ({
-                  id: m.councilMemberId ? String(m.councilMemberId) : (m.id ? String(m.id) : ""),
+            secretaryHcdId: comision.secretaryHcdId ?? undefined,
+            members: Array.isArray(comision.members)
+              ? comision.members.map((m: any) => ({
+                  id: m.id ? String(m.id) : "",
                   name: m.name ?? ""
                 }))
-              : (Array.isArray(comision.members)
-                ? comision.members.map((m: any) => ({
-                    id: m.id ? String(m.id) : "",
-                    name: m.name ?? ""
-                  }))
-                : []),
+              : [],
           }}
         />
       </div>

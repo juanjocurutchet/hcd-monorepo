@@ -134,6 +134,13 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
     const { id: numericId, error } = await validateAdminAndId(request, id)
     if (error) return error
 
+    // Desvincular a todos los concejales de este bloque
+    await db
+      .update(councilMembers)
+      .set({ blockId: null })
+      .where(eq(councilMembers.blockId, numericId))
+
+    // Ahora sí, eliminar el bloque
     await db.delete(politicalBlocks).where(eq(politicalBlocks.id, numericId))
     return NextResponse.json({ success: true })
   } catch (error) {

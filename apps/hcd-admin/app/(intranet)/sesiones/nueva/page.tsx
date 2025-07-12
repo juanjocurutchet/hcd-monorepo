@@ -1,4 +1,4 @@
-import SessionProviderWrapper from "../../SessionProviderWrapper";
+import SessionProviderWrapper from "../../../admin-panel/SessionProviderWrapper";
 import { SesionForm } from "../components/sesion-form";
 
 export default function NuevaSesionPage() {

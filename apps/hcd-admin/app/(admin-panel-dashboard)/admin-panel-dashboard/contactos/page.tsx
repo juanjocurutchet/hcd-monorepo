@@ -49,9 +49,18 @@ export default function ContactosPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(15)
+
   useEffect(() => {
     fetchContacts()
   }, [])
+
+  // Resetear a la primera página cuando cambien los filtros
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filterName, filterEmail, filterPosition])
 
   const fetchContacts = async () => {
     setLoading(true)
@@ -196,6 +205,7 @@ export default function ContactosPage() {
     setFilterName("")
     setFilterEmail("")
     setFilterPosition("")
+    setCurrentPage(1) // Resetear a la primera página al limpiar filtros
   }
 
   // Filtrar contactos por nombre, email y cargo
@@ -207,8 +217,16 @@ export default function ContactosPage() {
     return matchesName && matchesEmail && matchesPosition
   })
 
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentContacts = filteredContacts.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage)
+
   // Verificar si hay filtros activos
   const hasActiveFilters = filterName || filterEmail || filterPosition
+
+
 
   return (
     <div className="space-y-8">
@@ -254,15 +272,20 @@ export default function ContactosPage() {
       {/* Filtros */}
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              Limpiar filtros
-            </button>
-          )}
+          <h3 className="text-lg font-medium text-gray-900">Contactos</h3>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-500">
+              {filteredContacts.length} contacto{filteredContacts.length !== 1 ? 's' : ''}
+            </span>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Limpiar filtros
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -307,9 +330,6 @@ export default function ContactosPage() {
 
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500">
-              {filteredContacts.length} de {contacts.length} contactos
-            </span>
             {hasActiveFilters && (
               <span className="text-sm text-blue-600">
                 Filtros activos: {[filterName && "Nombre", filterEmail && "Email", filterPosition && "Cargo"].filter(Boolean).join(", ")}
@@ -332,11 +352,11 @@ export default function ContactosPage() {
           <tbody className="bg-white divide-y divide-gray-200">
             {loading ? (
               <tr><td colSpan={4} className="p-4 text-center text-gray-400">Cargando...</td></tr>
-            ) : filteredContacts.length === 0 ? (
+            ) : currentContacts.length === 0 ? (
               <tr><td colSpan={4} className="p-4 text-center text-gray-400">
                 {hasActiveFilters ? "No hay contactos que coincidan con los filtros" : "Sin contactos"}
               </td></tr>
-            ) : filteredContacts.map(contact => (
+            ) : currentContacts.map(contact => (
               <tr key={contact.id}>
                 <td className="px-6 py-4 whitespace-nowrap">{contact.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{contact.email}</td>
@@ -369,6 +389,46 @@ export default function ContactosPage() {
             ))}
           </tbody>
         </table>
+
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <div className="px-6 py-3 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, filteredContacts.length)} de {filteredContacts.length} contactos
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Anterior
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 text-sm border rounded ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 text-sm border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal de edición */}

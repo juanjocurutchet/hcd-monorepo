@@ -25,6 +25,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Fecha y tipo son requeridos" }, { status: 400 });
     }
     const [year, month, day] = dateStr.split('-').map(Number);
+
+    // Validar que todos los componentes de la fecha sean números válidos
+    if (!year || !month || !day || isNaN(year) || isNaN(month) || isNaN(day)) {
+      return NextResponse.json({ error: "Formato de fecha inválido" }, { status: 400 });
+    }
+
     const date = new Date(year, month - 1, day);
     const agendaFile = formData.get("agendaFile") as File | null;
     const minutesFile = formData.get("minutesFile") as File | null;

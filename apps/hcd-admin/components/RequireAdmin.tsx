@@ -12,8 +12,8 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
     if (!session) {
       router.replace("/admin-panel/login");
     } else if (
-      session.user.role !== "ADMIN" &&
-      session.user.role !== "SUPERADMIN"
+      !session.user ||
+      ((session.user as any).role !== "ADMIN" && (session.user as any).role !== "SUPERADMIN")
     ) {
       router.replace("/");
     }
@@ -21,7 +21,8 @@ export default function RequireAdmin({ children }: { children: React.ReactNode }
 
   if (
     !session ||
-    (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")
+    !session.user ||
+    ((session.user as any).role !== "ADMIN" && (session.user as any).role !== "SUPERADMIN")
   ) {
     return null; // O spinner
   }

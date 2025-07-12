@@ -95,10 +95,10 @@ export default function WeekView({
           <ChevronLeft className="w-5 h-5" />
         </button>
         <h3 className="text-lg font-semibold">
-          Semana del {weekDays[0].toLocaleDateString('es-ES', {
+          Semana del {weekDays[0]?.toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'long'
-          })} al {weekDays[6].toLocaleDateString('es-ES', {
+          })} al {weekDays[6]?.toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'long',
             year: 'numeric'

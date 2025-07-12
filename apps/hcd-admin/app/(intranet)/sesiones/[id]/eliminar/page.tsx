@@ -1,6 +1,6 @@
 import { getSessionById } from "@/lib/services/session-service"
 import { notFound } from "next/navigation"
-import SessionProviderWrapper from "../../../SessionProviderWrapper"
+import SessionProviderWrapper from "../../../../admin-panel/SessionProviderWrapper"
 import EliminarSesionForm from "../../components/eliminar-sesion-form"
 
 interface PageProps {

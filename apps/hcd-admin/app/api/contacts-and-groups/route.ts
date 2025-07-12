@@ -20,7 +20,7 @@ export async function GET() {
 
     // Para cada grupo, obtener sus miembros
     const groupsWithMembers = await Promise.all(
-      allGroups.map(async (group) => {
+      allGroups.map(async (group: { id: number; name: string; description: string | null; createdAt: Date; updatedAt: Date }) => {
         const members = await db
           .select({
             id: contactGroupMembers.id,

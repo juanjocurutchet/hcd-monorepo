@@ -4,7 +4,7 @@ import { NextRequest } from "next/server"
 export async function isAdmin(request: NextRequest): Promise<boolean> {
   try {
     const token = await getToken({
-      req: request,
+      req: request as any,
       secret: process.env.NEXTAUTH_SECRET
     })
 

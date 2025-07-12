@@ -6,7 +6,9 @@ export default function IntranetLayout({ children }: PropsWithChildren<{}>) {
   return (
     <RequireAuth>
       <InternalHeader />
-      {children}
+      <div style={{ maxWidth: 1400, margin: '0 auto' }} className="w-full">
+        {children}
+      </div>
     </RequireAuth>
   );
 }

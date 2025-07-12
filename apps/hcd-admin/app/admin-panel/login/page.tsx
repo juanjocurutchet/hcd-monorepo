@@ -22,13 +22,13 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/"
+        callbackUrl: "/admin-panel-dashboard"
       })
 
       if (result?.error) {
         setError("Credenciales inválidas")
       } else {
-        window.location.href = "/"
+        window.location.href = "/admin-panel-dashboard"
       }
     } catch (err) {
       setError("Error al iniciar sesión")

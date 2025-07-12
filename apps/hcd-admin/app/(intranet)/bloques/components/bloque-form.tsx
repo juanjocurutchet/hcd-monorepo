@@ -104,7 +104,7 @@ export default function BloqueForm({ bloque, concejales, miembrosActuales = [] }
       setSuccess(bloque ? "Bloque actualizado correctamente" : "Bloque creado correctamente")
 
       if (!bloque) {
-        window.location.href = '/admin-panel/bloques'
+        window.location.href = '/admin-panel-dashboard/bloques'
       }
       router.refresh()
     } catch (error: any) {

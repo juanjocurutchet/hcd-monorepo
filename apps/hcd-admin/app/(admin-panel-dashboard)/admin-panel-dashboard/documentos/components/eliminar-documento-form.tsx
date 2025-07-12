@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { deleteDocument } from "@/actions/document-actions"
+import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface EliminarDocumentoFormProps {
   documento: {
@@ -20,7 +20,7 @@ export default function EliminarDocumentoForm({ documento }: EliminarDocumentoFo
     setIsLoading(true)
     try {
       await deleteDocument(documento.id)
-      router.push("/admin-panel/documentos")
+      router.push("/admin-panel-dashboard/documentos")
     } catch (error) {
       console.error("Error al eliminar documento:", error)
     } finally {

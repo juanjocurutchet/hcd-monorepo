@@ -1,4 +1,5 @@
 import { sql } from "@/lib/db-singleton";
+import { deleteFile, uploadFile } from "@/lib/storage";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, context: { params: { id: string } }) {
@@ -22,48 +23,57 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       `
     }
 
-    if (!result || result.length === 0) {
+    if (!result || !Array.isArray(result) || result.length === 0) {
+      return NextResponse.json(
+        { error: 'Ordenanza no encontrada' },
+        { status: 404 }
+      )
+        }
+    const ordinance = result[0] as any
+
+    if (!ordinance) {
       return NextResponse.json(
         { error: 'Ordenanza no encontrada' },
         { status: 404 }
       )
     }
-    const ordinance = result[0]
 
     // Buscar modificatorias: obtener los numeros de las modificadoras
     const modRows = await sql`
       SELECT modificadora_numero FROM ordinance_modifica WHERE ordinance_id = ${ordinance.id}
     `
-    const modificadoraNumeros = modRows.map((row: any) => row.modificadora_numero).filter(Boolean)
-    let modificatorias = []
+    const modificadoraNumeros = Array.isArray(modRows) ? modRows.map((row: any) => row.modificadora_numero).filter(Boolean) : []
+    let modificatorias: any[] = []
     if (modificadoraNumeros.length > 0) {
-      modificatorias = await sql`
+      const result = await sql`
         SELECT id, approval_number, title, year, type, category, notes, is_active, file_url, slug, created_at
         FROM ordinances
         WHERE approval_number = ANY(${modificadoraNumeros})
       `
+      modificatorias = Array.isArray(result) ? result : []
     }
 
     // Buscar ordenanzas que esta ordenanza modifica
     const modificaRows = await sql`
       SELECT ordinance_id FROM ordinance_modifica WHERE modificadora_numero = ${ordinance.approval_number}
     `
-    const modificaIds = modificaRows.map((row: any) => row.ordinance_id).filter(Boolean)
-    let modificaOrdenanzas = []
+    const modificaIds = Array.isArray(modificaRows) ? modificaRows.map((row: any) => row.ordinance_id).filter(Boolean) : []
+    let modificaOrdenanzas: any[] = []
     if (modificaIds.length > 0) {
-      modificaOrdenanzas = await sql`
+      const result = await sql`
         SELECT id, approval_number, title, year, type, category, notes, is_active, file_url, slug, created_at
         FROM ordinances
         WHERE id = ANY(${modificaIds})
       `
+      modificaOrdenanzas = Array.isArray(result) ? result : []
     }
 
     // Buscar ordenanzas que esta ordenanza deroga
     const derogaRows = await sql`
       SELECT id, approval_number, title, year FROM ordinances WHERE derogada_por = ${ordinance.approval_number}
     `
-    let derogaOrdenanzas = []
-    if (derogaRows.length > 0) {
+    let derogaOrdenanzas: any[] = []
+    if (Array.isArray(derogaRows) && derogaRows.length > 0) {
       derogaOrdenanzas = derogaRows
     }
 
@@ -89,15 +99,17 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
       // Buscar por slug
       result = await sql`DELETE FROM ordinances WHERE slug = ${id} RETURNING *`
     }
-    if (!result || result.length === 0) {
+    if (!result || !Array.isArray(result) || result.length === 0) {
       return NextResponse.json(
         { error: 'Ordenanza no encontrada' },
         { status: 404 }
       )
     }
     // Eliminar relaciones en ordinance_modifica
-    const deleted = result[0]
-    await sql`DELETE FROM ordinance_modifica WHERE ordinance_id = ${deleted.id} OR modificadora_numero = ${deleted.approval_number}`
+    const deleted = result[0] as any
+    if (deleted) {
+      await sql`DELETE FROM ordinance_modifica WHERE ordinance_id = ${deleted.id} OR modificadora_numero = ${deleted.approval_number}`
+    }
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error en DELETE /api/ordinances/[id]:', error)
@@ -116,18 +128,24 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     let prevFileUrl: string | null = null;
     if (/^\d+$/.test(id)) {
       const res = await sql`SELECT id, file_url FROM ordinances WHERE id = ${Number(id)}`;
-      if (!res || res.length === 0) {
+      if (!res || !Array.isArray(res) || res.length === 0) {
         return NextResponse.json({ error: 'Ordenanza no encontrada' }, { status: 404 });
       }
-      dbId = res[0].id;
-      prevFileUrl = res[0].file_url;
+      const ordinance = res[0] as any;
+      if (ordinance) {
+        dbId = ordinance.id;
+        prevFileUrl = ordinance.file_url;
+      }
     } else {
       const res = await sql`SELECT id, file_url FROM ordinances WHERE slug = ${id}`;
-      if (!res || res.length === 0) {
+      if (!res || !Array.isArray(res) || res.length === 0) {
         return NextResponse.json({ error: 'Ordenanza no encontrada' }, { status: 404 });
       }
-      dbId = res[0].id;
-      prevFileUrl = res[0].file_url;
+      const ordinance = res[0] as any;
+      if (ordinance) {
+        dbId = ordinance.id;
+        prevFileUrl = ordinance.file_url;
+      }
     }
     if (!dbId) return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
 
@@ -152,7 +170,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
         await deleteFile(publicId);
       }
       if (eliminarArchivo && !(file && file.size > 0)) {
-        file_url = null;
+        file_url = undefined;
       }
     }
     let slugValue = formData.get("slug") as string | undefined;
@@ -180,7 +198,11 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     }
     updateQuery = sql`${updateQuery} WHERE id = ${dbId} RETURNING *`;
     const result = await updateQuery;
-    const ordinance = result[0];
+    const ordinance = Array.isArray(result) ? result[0] as any : null;
+
+    if (!ordinance) {
+      return NextResponse.json({ error: 'Error al actualizar la ordenanza' }, { status: 500 });
+    }
 
     // Limpiar relaciones anteriores
     await sql`DELETE FROM ordinance_modifica WHERE modificadora_numero = ${ordinance.approval_number}`;

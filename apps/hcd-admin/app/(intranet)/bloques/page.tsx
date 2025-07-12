@@ -41,7 +41,7 @@ export default function BloquesListPage() {
               className="flex justify-between items-center p-4 bg-white shadow rounded border border-gray-200 hover:bg-gray-50 transition cursor-pointer"
             >
               <Link
-                href={`/admin-panel/bloques/${bloque.id}`}
+                href={`/admin-panel-dashboard/bloques/${bloque.id}`}
                 className="flex-1 flex items-center space-x-4 min-w-0"
                 prefetch={false}
                 style={{ textDecoration: 'none' }}

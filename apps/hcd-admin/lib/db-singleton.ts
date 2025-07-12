@@ -9,6 +9,10 @@ if (!process.env.DATABASE_URL) {
 // Crear una instancia singleton de la conexión
 let globalForDb = globalThis as unknown as { dbInstance?: ReturnType<typeof drizzle>, sqlInstance?: ReturnType<typeof neon> };
 
+// Variables para producción
+let sqlInstance: ReturnType<typeof neon> | undefined;
+let dbInstance: ReturnType<typeof drizzle> | undefined;
+
 function getSql() {
   if (process.env.NODE_ENV === "development") {
     if (!globalForDb.sqlInstance) {

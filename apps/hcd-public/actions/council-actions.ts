@@ -104,7 +104,7 @@ export async function getAllPoliticalBlocksWithPresident(): Promise<(PoliticalBl
       .orderBy(asc(politicalBlocks.name))
 
     const blocksWithDetails = await Promise.all(
-      blocks.map(async (block) => {
+      blocks.map(async (block: any) => {
         let president = null
 
         if (block.presidentId !== null) {

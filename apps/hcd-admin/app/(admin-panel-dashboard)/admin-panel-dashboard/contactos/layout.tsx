@@ -11,8 +11,8 @@ export default function ContactosLayout({ children }: { children: React.ReactNod
       <h1 className="text-3xl font-bold mb-6">Gestión de Contactos</h1>
       <div className="mb-8 border-b border-gray-200">
         <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-          <TabLink href="/admin-panel/contactos" active={pathname === "/admin-panel/contactos"}>Contactos</TabLink>
-          <TabLink href="/admin-panel/contactos/grupos" active={pathname === "/admin-panel/contactos/grupos"}>Grupos</TabLink>
+          <TabLink href="/admin-panel-dashboard/contactos" active={pathname === "/admin-panel-dashboard/contactos"}>Contactos</TabLink>
+          <TabLink href="/admin-panel-dashboard/contactos/grupos" active={pathname === "/admin-panel-dashboard/contactos/grupos"}>Grupos</TabLink>
         </nav>
       </div>
       <div>{children}</div>
