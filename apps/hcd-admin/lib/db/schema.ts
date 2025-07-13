@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { boolean, integer, pgEnum, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core"
+import { boolean, integer, pgEnum, pgTable, serial, text, timestamp, unique, varchar } from "drizzle-orm/pg-core"
 
 // Enums
 export const documentTypeEnum = pgEnum("document_type", ["ordenanza", "decreto", "resolucion", "comunicacion"])
@@ -7,14 +7,16 @@ export const sessionTypeEnum = pgEnum("session_type", ["ordinaria", "extraordina
 
 // Tablas
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
-  role: varchar("role", { length: 50 }).default("editor").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(), // 👈 ahora usa camelCase exacto
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-})
+	id: serial().primaryKey().notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 255 }).notNull(),
+	password: varchar({ length: 255 }).notNull(),
+	role: varchar({ length: 50 }).default('editor').notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	unique("users_email_unique").on(table.email),
+]);
 
 export const news = pgTable("news", {
   id: serial("id").primaryKey(),

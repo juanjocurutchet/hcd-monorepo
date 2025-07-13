@@ -109,7 +109,7 @@ export async function changePassword(userId: number, currentPassword: string, ne
     .update(users)
     .set({
       password: hashedPassword,
-      updated_at: new Date(),
+      updatedAt: new Date(),
     })
     .where(eq(users.id, userId))
   return { success: true }

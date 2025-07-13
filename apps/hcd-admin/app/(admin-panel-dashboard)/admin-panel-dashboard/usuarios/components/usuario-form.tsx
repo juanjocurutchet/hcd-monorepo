@@ -113,7 +113,7 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario | null }) {
         data.password = formData.password
       }
 
-      const url = usuario ? `/api/users/${usuario.id}` : "/api/auth/register"
+      const url = usuario ? `/api/users/${usuario.id}` : "/api/users"
       const method = usuario ? "PUT" : "POST"
 
       const response = await fetch(url, {
@@ -196,7 +196,7 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario | null }) {
       if (!usuario || formData.password) {
         data.password = formData.password;
       }
-      const url = usuario ? `/api/users/${usuario.id}` : "/api/auth/register";
+      const url = usuario ? `/api/users/${usuario.id}` : "/api/users";
       const method = usuario ? "PUT" : "POST";
       const response = await fetch(url, {
         method,

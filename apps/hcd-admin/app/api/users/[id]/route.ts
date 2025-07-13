@@ -2,6 +2,7 @@ import { db } from "@/lib/db-singleton";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 
 export async function DELETE(
   request: NextRequest,
@@ -57,8 +58,8 @@ export async function PUT(
     }
     const updateData: any = { name, email, role };
     if (password) {
-      // Aquí deberías hashear la contraseña antes de guardarla
-      updateData.password = password;
+      // Hashear la contraseña antes de guardarla
+      updateData.password = await bcrypt.hash(password, 10);
     }
     console.log(`[API][PUT /api/users/${userId}] Actualizando usuario...`);
     const updatedUser = await db
