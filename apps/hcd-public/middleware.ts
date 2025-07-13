@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 import { getToken } from "next-auth/jwt"
+import type { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
 
   if (isPublicRoute) return response
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+  const token = await getToken({ req: request as any, secret: process.env.NEXTAUTH_SECRET })
 
   const isProtectedRoute = path.startsWith("/admin-panel")
 
