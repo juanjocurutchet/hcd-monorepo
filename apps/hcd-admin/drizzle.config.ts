@@ -1,4 +1,7 @@
-import { defineConfig } from "drizzle-kit"
+import { defineConfig } from "drizzle-kit";
+import * as dotenv from "dotenv";
+
+dotenv.config(); // Carga las variables de .env
 
 export default defineConfig({
   schema: "./lib/db/schema.ts",
@@ -11,4 +14,4 @@ export default defineConfig({
     database: process.env.DB_NAME!,
     ssl: "require",
   },
-})
+});

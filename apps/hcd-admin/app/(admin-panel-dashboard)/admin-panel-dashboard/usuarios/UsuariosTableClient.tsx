@@ -24,7 +24,6 @@ export default function UsuariosTableClient() {
 
   async function fetchUsuarios() {
     setLoading(true)
-    console.log("[UsuariosTableClient] Iniciando fetchUsuarios...")
     try {
       const res = await fetch("/api/users", {
         cache: "no-store",
@@ -35,12 +34,10 @@ export default function UsuariosTableClient() {
         }
       })
       const data = await res.json()
-      console.log("[UsuariosTableClient] Datos recibidos:", data)
-      // Ahora data es un array de usuarios directamente
-      const usuariosArray = Array.isArray(data) ? data : [];
+      const usuariosArray = Array.isArray(data) ? data : []
       setUsuarios(usuariosArray)
     } catch (error) {
-      console.error("[UsuariosTableClient] Error al fetch:", error)
+      console.error("Error al cargar usuarios:", error)
       setUsuarios([])
     } finally {
       setLoading(false)
@@ -51,44 +48,30 @@ export default function UsuariosTableClient() {
     fetchUsuarios()
   }, [])
 
-  // Actualizar cuando se regrese a la página de usuarios
   useEffect(() => {
     if (pathname === "/admin-panel-dashboard/usuarios") {
       fetchUsuarios()
     }
   }, [pathname])
 
-  // Forzar actualización cuando se regrese a la página
+  // 🔁 NUEVO: recarga usuarios al volver a la pestaña
   useEffect(() => {
-    const handleFocus = () => {
-      if (pathname === "/admin-panel-dashboard/usuarios") {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         fetchUsuarios()
       }
     }
 
-    const handlePopState = () => {
-      if (pathname === "/admin-panel-dashboard/usuarios") {
-        fetchUsuarios()
-      }
-    }
-
-    window.addEventListener('focus', handleFocus)
-    window.addEventListener('popstate', handlePopState)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
     return () => {
-      window.removeEventListener('focus', handleFocus)
-      window.removeEventListener('popstate', handlePopState)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
-  }, [pathname])
+  }, [])
 
   const handleDelete = async (userId: number) => {
     setShowDeleteModal(false)
     await fetch(`/api/users/${userId}`, { method: "DELETE" })
     fetchUsuarios()
-  }
-
-  const handleEdit = (user: any) => {
-    setSelectedUser(user)
-    setShowEditModal(true)
   }
 
   const filtered = usuarios.filter(u => {

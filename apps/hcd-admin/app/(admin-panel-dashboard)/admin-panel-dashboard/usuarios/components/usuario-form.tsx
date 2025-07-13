@@ -130,8 +130,8 @@ export function UsuarioForm({ usuario }: { usuario?: Usuario | null }) {
       }
 
       // Redireccionar a la lista de usuarios
-      router.push("/admin-panel-dashboard/usuarios")
-      router.refresh()
+      router.replace("/admin-panel-dashboard/usuarios");
+
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)

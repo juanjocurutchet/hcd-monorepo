@@ -12,8 +12,8 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: varchar("role", { length: 50 }).default("editor").notNull(),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(), // 👈 ahora usa camelCase exacto
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 })
 
 export const news = pgTable("news", {
