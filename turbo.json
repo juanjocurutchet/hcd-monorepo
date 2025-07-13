@@ -17,5 +17,27 @@
       "cache": false,
       "persistent": true
     }
-  }
+  },
+  "globalEnv": [
+    "DATABASE_URL",
+    "DB_HOST",
+    "DB_USER",
+    "DB_PASS",
+    "DB_NAME",
+    "NEXTAUTH_URL",
+    "NEXTAUTH_SECRET",
+    "JWT_SECRET",
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
+    "CLOUDINARY_URL",
+    "EMAIL_FROM",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+    "SMTP_FROM",
+    "NOTIFICATION_EMAIL",
+    "NEXT_PUBLIC_OPENWEATHER_API_KEY"
+  ]
 }
