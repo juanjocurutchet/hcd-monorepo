@@ -4,10 +4,12 @@ import { uploadFile } from "@/lib/storage"
 import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // JOIN con political_blocks para traer el nombre y color del bloque
-    const result = await db
+    const { searchParams } = new URL(request.url)
+    const blockId = searchParams.get("blockId")
+
+    let query = db
       .select({
         id: councilMembers.id,
         name: councilMembers.name,
@@ -22,6 +24,12 @@ export async function GET() {
       })
       .from(councilMembers)
       .leftJoin(politicalBlocks, eq(councilMembers.blockId, politicalBlocks.id))
+
+    if (blockId) {
+      query = query.where(eq(councilMembers.blockId, Number(blockId)))
+    }
+
+    const result = await query
     return NextResponse.json(result, {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",

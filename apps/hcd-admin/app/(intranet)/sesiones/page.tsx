@@ -3,6 +3,7 @@
 import { formatDate } from "@/lib/utils/format";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import SesionAcordeon from "./components/SesionAcordeon";
 
 interface Session {
   id: number;
@@ -60,31 +61,23 @@ export default function SesionesPage() {
       ) : error ? (
         <div className="text-center py-8 text-red-500">{error}</div>
       ) : (
-        <ul className="space-y-4">
+        <div className="space-y-4">
           {sesiones.map((sesion) => (
-            <li
+            <SesionAcordeon
               key={sesion.id}
-              className="flex justify-between items-center p-4 bg-white shadow rounded border border-gray-200 hover:bg-gray-50 transition cursor-pointer"
-            >
-              <Link
-                href={`/admin-panel/sesiones/${sesion.id}`}
-                className="flex-1 flex items-center space-x-4 min-w-0"
-                prefetch={false}
-                style={{ textDecoration: 'none' }}
-              >
-                <div className="w-2 h-10 rounded bg-green-400" />
-                <div className="min-w-0">
-                  <p className="text-lg font-semibold truncate">
-                    {formatDate(sesion.date)} — {sesion.type}
-                  </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {sesion.isPublished ? "Publicada" : "No publicada"}
-                  </p>
-                </div>
-              </Link>
-            </li>
+              sesion={{
+                id: sesion.id,
+                fecha: sesion.date,
+                titulo: `${formatDate(sesion.date)} — ${sesion.type}`,
+                ordenDiaUrl: sesion.ordenDiaUrl, // Ajusta según tu backend
+                actaUrl: sesion.actaUrl,         // Ajusta según tu backend
+                audioUrl: sesion.audioUrl,       // Ajusta según tu backend
+                videoUrl: sesion.videoUrl,       // Ajusta según tu backend
+                proyectos: sesion.proyectos || [], // Ajusta según tu backend
+              }}
+            />
           ))}
-        </ul>
+        </div>
       )}
 
       {!loading && sesiones.length === 0 && (

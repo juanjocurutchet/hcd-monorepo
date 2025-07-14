@@ -32,7 +32,7 @@ export default function ComisionesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Comisiones</h1>
-        <Link href="/admin-panel/comisiones/nueva" className="text-blue-600 hover:underline">
+        <Link href="/admin-panel-dashboard/comisiones/nueva" className="text-blue-600 hover:underline">
           Agregar comisión
         </Link>
       </div>
@@ -49,7 +49,7 @@ export default function ComisionesPage() {
               className="flex justify-between items-center p-4 bg-white shadow rounded border border-gray-200 hover:bg-gray-50 transition cursor-pointer"
             >
               <Link
-                href={`/admin-panel/comisiones/${comision.id}`}
+                href={`/admin-panel-dashboard/comisiones/${comision.id}`}
                 className="flex-1 flex items-center space-x-4 min-w-0"
                 prefetch={false}
                 style={{ textDecoration: 'none' }}

@@ -12,7 +12,6 @@ const NAV_ITEMS = [
   { label: "Sesiones", href: "/sesiones" },
   { label: "Comisiones", href: "/comisiones" },
   { label: "Bloques", href: "/bloques" },
-  { label: "Concejales por bloque", href: "/concejales" },
   { label: "Legislación", href: "/legislacion" },
   { label: "Mesa de Entrada", href: "/mesa-entrada" },
 ]
