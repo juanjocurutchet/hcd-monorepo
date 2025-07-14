@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
         id: councilMembers.id,
         name: councilMembers.name,
         position: councilMembers.position,
+        seniorPosition: councilMembers.seniorPosition,
         blockId: councilMembers.blockId,
         mandate: councilMembers.mandate,
         imageUrl: councilMembers.imageUrl,
