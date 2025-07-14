@@ -15,7 +15,12 @@ export default async function EditBloquePage({ params }: { params: { id: string 
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Editar Bloque</h1>
       <BloqueForm
-        bloque={bloque}
+        bloque={{
+          id: bloque.id,
+          name: bloque.name,
+          color: bloque.color ?? null,
+          president: bloque.president ?? null,
+        }}
         concejales={concejales}
         miembrosActuales={(bloque as any).members}
       />

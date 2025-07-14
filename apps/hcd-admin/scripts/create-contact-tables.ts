@@ -6,10 +6,10 @@
  */
 
 import { config } from 'dotenv'
-import { dirname, resolve } from 'path'
-import { fileURLToPath } from 'url'
+import { resolve } from 'path'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// Reemplazo import.meta.url por __dirname para compatibilidad con CommonJS/TS
+// const __dirname = dirname(fileURLToPath(import.meta.url))
 config({ path: resolve(__dirname, '../.env') })
 
 import { db } from "../lib/db-singleton"

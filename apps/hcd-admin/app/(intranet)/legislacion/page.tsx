@@ -441,7 +441,7 @@ export default function LegislacionPage() {
                                 <div className="text-sm text-gray-600">Cargando modificatorias...</div>
                               ) : mods.length > 0 ? (
                                 mods.map((mod: any) => {
-                                  const modExt = mod.file_url?.split('.').pop()?.toLowerCase();
+                                  const modExt = mod.file_url?.split('.').pop()?.toLowerCase() || "";
                                   let modType = 'other';
                                   if (modExt === 'pdf') modType = 'pdf';
                                   else if (["jpg", "jpeg", "png", "gif", "webp"].includes(modExt || '')) modType = 'image';
@@ -535,7 +535,7 @@ export default function LegislacionPage() {
                                 <DialogTitle>Previsualización de archivo</DialogTitle>
                               </DialogHeader>
                               {(() => {
-                                const ext = ordinance.file_url?.split('.').pop()?.toLowerCase();
+                                const ext = ordinance.file_url?.split('.').pop()?.toLowerCase() || "";
                                 if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
                                   return <img src={ordinance.file_url} alt="Vista previa" style={{ maxWidth: '100%', maxHeight: 500 }} />;
                                 } else if (ext === 'pdf') {

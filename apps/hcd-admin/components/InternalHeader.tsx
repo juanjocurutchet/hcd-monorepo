@@ -83,10 +83,10 @@ export default function InternalHeader() {
                     <img src={session.user.image} alt="avatar" className="w-8 h-8 rounded-full object-cover border" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-blue-300 flex items-center justify-center text-white font-bold text-sm border">
-                      {session.user.name?.[0]?.toUpperCase() || "U"}
+                      {(session.user.name?.[0]?.toUpperCase() ?? "U")}
                     </div>
                   )}
-                  <span className="text-sm font-medium text-gray-800 max-w-[120px] truncate">{session.user.name}</span>
+                  <span className="text-sm font-medium text-gray-800 max-w-[120px] truncate">{session.user.name ?? ""}</span>
                 </button>
                 {open && (
                   <div className="absolute right-0 mt-2 w-64 bg-white border rounded shadow-lg z-50 p-5 min-w-[220px] flex flex-col items-center">
@@ -94,12 +94,12 @@ export default function InternalHeader() {
                       <img src={session.user.image} alt="avatar" className="w-14 h-14 rounded-full object-cover border mb-2" />
                     ) : (
                       <div className="w-14 h-14 rounded-full bg-blue-300 flex items-center justify-center text-white font-bold text-2xl border mb-2">
-                        {session.user.name?.[0]?.toUpperCase() || "U"}
+                        {(session.user.name?.[0]?.toUpperCase() ?? "U")}
                       </div>
                     )}
                     <div className="text-center mb-3">
-                      <div className="font-semibold text-gray-900">{session.user.name}</div>
-                      <div className="text-xs text-gray-500">{session.user.email}</div>
+                      <div className="font-semibold text-gray-900">{session.user.name ?? ""}</div>
+                      <div className="text-xs text-gray-500">{session.user.email ?? ""}</div>
                     </div>
                     <button
                       onClick={() => signOut({ callbackUrl: "/admin-panel/login" })}

@@ -34,7 +34,7 @@ export default async function EditarComisionPage({ params }: PageProps) {
             secretaryHcdId: comision.secretaryHcdId ?? undefined,
             members: Array.isArray(comision.members)
               ? comision.members.map((m: any) => ({
-                  id: m.id ? String(m.id) : "",
+                  id: m.id !== null && m.id !== undefined ? String(m.id) : "",
                   name: m.name ?? ""
                 }))
               : [],

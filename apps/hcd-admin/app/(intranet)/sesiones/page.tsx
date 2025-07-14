@@ -69,11 +69,11 @@ export default function SesionesPage() {
                 id: sesion.id,
                 fecha: sesion.date,
                 titulo: `${formatDate(sesion.date)} — ${sesion.type}`,
-                ordenDiaUrl: sesion.ordenDiaUrl, // Ajusta según tu backend
-                actaUrl: sesion.actaUrl,         // Ajusta según tu backend
-                audioUrl: sesion.audioUrl,       // Ajusta según tu backend
-                videoUrl: sesion.videoUrl,       // Ajusta según tu backend
-                proyectos: sesion.proyectos || [], // Ajusta según tu backend
+                ordenDiaUrl: (sesion as any).ordenDiaUrl ?? undefined,
+                actaUrl: (sesion as any).actaUrl ?? undefined,
+                audioUrl: (sesion as any).audioUrl ?? undefined,
+                videoUrl: (sesion as any).videoUrl ?? undefined,
+                proyectos: (sesion as any).proyectos ?? [],
               }}
             />
           ))}
