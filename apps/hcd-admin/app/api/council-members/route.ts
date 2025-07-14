@@ -6,10 +6,10 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const blockId = searchParams.get("blockId")
+    const { searchParams } = new URL(request.url);
+    const blockId = searchParams.get("blockId");
 
-    let baseQuery = db
+    const baseQuery = db
       .select({
         id: councilMembers.id,
         name: councilMembers.name,
@@ -23,26 +23,29 @@ export async function GET(request: NextRequest) {
         blockName: politicalBlocks.name,
         blockColor: politicalBlocks.color,
       })
-      .from(councilMembers)
+      .from(councilMembers);
 
-    if (blockId) {
-      baseQuery = baseQuery.where(eq(councilMembers.blockId, Number(blockId)))
-    }
+    const filteredQuery = blockId
+      ? baseQuery.where(eq(councilMembers.blockId, Number(blockId)))
+      : baseQuery;
 
-    const query = baseQuery.leftJoin(politicalBlocks, eq(councilMembers.blockId, politicalBlocks.id))
-    const result = await query
+    const result = await filteredQuery.leftJoin(
+      politicalBlocks,
+      eq(councilMembers.blockId, politicalBlocks.id)
+    );
     return NextResponse.json(result, {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
         "Pragma": "no-cache",
         "Expires": "0"
       }
-    })
+    });
   } catch (error) {
-    console.error("Error fetching council members:", error)
-    return NextResponse.json({ error: "Error al obtener los concejales" }, { status: 500 })
+    console.error("Error fetching council members:", error);
+    return NextResponse.json({ error: "Error al obtener los concejales" }, { status: 500 });
   }
 }
+
 
 export async function POST(request: NextRequest) {
   try {
