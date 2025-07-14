@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const blockId = searchParams.get("blockId")
 
-    let query = db
+    let baseQuery = db
       .select({
         id: councilMembers.id,
         name: councilMembers.name,
@@ -24,12 +24,12 @@ export async function GET(request: NextRequest) {
         blockColor: politicalBlocks.color,
       })
       .from(councilMembers)
-      .leftJoin(politicalBlocks, eq(councilMembers.blockId, politicalBlocks.id))
 
     if (blockId) {
-      query = query.where(eq(councilMembers.blockId, Number(blockId)))
+      baseQuery = baseQuery.where(eq(councilMembers.blockId, Number(blockId)))
     }
 
+    const query = baseQuery.leftJoin(politicalBlocks, eq(councilMembers.blockId, politicalBlocks.id))
     const result = await query
     return NextResponse.json(result, {
       headers: {
