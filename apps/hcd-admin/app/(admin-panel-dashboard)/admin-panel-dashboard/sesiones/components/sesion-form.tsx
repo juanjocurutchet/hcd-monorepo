@@ -426,15 +426,15 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="date">Fecha *</Label>
-            <DatePicker
-              id="date"
-              value={formData.date}
-              format="DD-MM-YYYY"
-              locale={esES}
-              onChange={handleDateChange}
-              allowClear={false}
-              style={{ width: '100%' }}
-            />
+                            <DatePicker
+                  id="date"
+                  value={formData.date}
+                  format="DD-MM-YYYY"
+                  locale={esES as any}
+                  onChange={handleDateChange}
+                  allowClear={false}
+                  style={{ width: '100%' }}
+                />
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Tipo *</Label>
@@ -538,7 +538,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                   id="date"
                   value={formData.date}
                   format="DD-MM-YYYY"
-                  locale={esES}
+                  locale={esES as any}
                   onChange={handleDateChange}
                   allowClear={false}
                   style={{ width: '100%' }}

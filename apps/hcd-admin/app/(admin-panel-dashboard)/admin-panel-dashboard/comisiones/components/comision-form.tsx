@@ -475,7 +475,7 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
                       <DatePicker
                         value={nuevoProyecto.fechaEntrada}
                         format="DD-MM-YYYY"
-                        locale={esES}
+                        locale={esES as any}
                         onChange={(date) =>
                           setNuevoProyecto(p => ({
                             ...p,
@@ -511,7 +511,7 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
                         <DatePicker
                           value={nuevoProyecto.fechaDespacho}
                           format="DD-MM-YYYY"
-                          locale={esES}
+                          locale={esES as any}
                           onChange={(date) =>
                             setNuevoProyecto(p => ({
                               ...p,
@@ -604,7 +604,7 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
                                 <DatePicker
                                   value={p.fechaEntrada && dayjs.isDayjs(p.fechaEntrada) ? p.fechaEntrada : (p.fechaEntrada ? dayjs(p.fechaEntrada, "YYYY-MM-DD") : null)}
                                   format="DD-MM-YYYY"
-                                  locale={esES}
+                                  locale={esES as any}
                                   onChange={(date) =>
                                     handleEditProyectoChange(idx, "fechaEntrada", date && date.isValid() ? date : null)
                                   }
@@ -625,7 +625,7 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
                                 <DatePicker
                                   value={p.fechaDespacho && dayjs.isDayjs(p.fechaDespacho) ? p.fechaDespacho : (p.fechaDespacho ? dayjs(p.fechaDespacho, "YYYY-MM-DD") : null)}
                                   format="DD-MM-YYYY"
-                                  locale={esES}
+                                  locale={esES as any}
                                   onChange={(date) =>
                                     handleEditProyectoChange(idx, "fechaDespacho", date && date.isValid() ? date : null)
                                   }

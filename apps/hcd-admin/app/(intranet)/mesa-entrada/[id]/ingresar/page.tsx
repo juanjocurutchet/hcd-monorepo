@@ -140,7 +140,7 @@ export default function IngresarProyectoPage() {
               <DatePicker
                 value={form.fechaEntrada}
                 format="DD-MM-YYYY"
-                locale={esES}
+                locale={esES as any}
                 onChange={handleDateChange}
                 allowClear={false}
                 style={{ width: '100%' }}
