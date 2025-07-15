@@ -1,0 +1,1 @@
+ALTER TABLE "session_files" ADD COLUMN "tipo" varchar(100) NOT NULL;

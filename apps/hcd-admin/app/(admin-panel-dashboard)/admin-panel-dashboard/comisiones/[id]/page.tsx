@@ -15,28 +15,26 @@ export default async function EditarComisionPage({ params }: PageProps) {
   if (!comision) notFound();
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
+    <div className="max-w-6xl mx-auto py-8 px-4">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Editar Comisión</h1>
         <p className="text-gray-600">Modifica la información de la comisión</p>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <ComisionForm
-          comision={{
-            ...comision,
-            id: String(comision.id),
-            description: comision.description ?? undefined,
-            presidentId: comision.presidentId ?? undefined,
-            secretaryId: comision.secretaryId ?? undefined,
-            members: Array.isArray(comision.members)
-              ? comision.members.map((m: any) => ({
-                  id: m.id !== null && m.id !== undefined ? String(m.id) : "",
-                  name: m.name ?? ""
-                }))
-              : [],
-          }}
-        />
-      </div>
+      <ComisionForm
+        comision={{
+          ...comision,
+          id: String(comision.id),
+          description: comision.description ?? undefined,
+          presidentId: comision.presidentId ?? undefined,
+          secretaryId: comision.secretaryId ?? undefined,
+          members: Array.isArray(comision.members)
+            ? comision.members.map((m: any) => ({
+                id: m.id !== null && m.id !== undefined ? String(m.id) : "",
+                name: m.name ?? ""
+              }))
+            : [],
+        }}
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { relations } from "drizzle-orm"
-import { boolean, integer, pgEnum, pgTable, serial, text, timestamp, unique, varchar } from "drizzle-orm/pg-core"
+import { relations } from "drizzle-orm";
+import { boolean, integer, pgEnum, pgTable, serial, text, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 
 // Enums
 export const documentTypeEnum = pgEnum("document_type", ["ordenanza", "decreto", "resolucion", "comunicacion"])
@@ -106,6 +106,21 @@ export const sessions = pgTable("sessions", {
   isPublished: boolean("is_published").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+})
+
+export const sessionFiles = pgTable("session_files", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").references(() => sessions.id).notNull(),
+  numeroExpediente: varchar("numero_expediente", { length: 100 }).notNull(),
+  fechaEntrada: timestamp("fecha_entrada").notNull(),
+  titulo: text("titulo").notNull(),
+  descripcion: text("descripcion"),
+  fileUrl: varchar("file_url", { length: 255 }),
+  origen: varchar("origen", { length: 50 }).notNull(),
+  prefijoOrigen: varchar("prefijo_origen", { length: 20 }).notNull(),
+  tipo: varchar("tipo", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 export const contactMessages = pgTable("contact_messages", {

@@ -340,377 +340,377 @@ export function ComisionForm({ comision = null }: { comision?: Comision | null }
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>No autorizado. Por favor, inicia sesión.</AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
     <Card className="w-full">
       <CardContent className="pt-6 px-2 md:px-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre *</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="Nombre de la comisión"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Descripción de la comisión"
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="presidentId">Presidente</Label>
-              <Select
-                value={formData.presidentId}
-                onValueChange={(value: string) => handleSelectChange("presidentId", value)}
-              >
-                <SelectTrigger id="presidentId">
-                  <SelectValue placeholder="Seleccionar presidente" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin presidente</SelectItem>
-                  {concejales.map((concejal) => (
-                    <SelectItem key={concejal.id} value={concejal.id.toString()}>
-                      {concejal.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="name">Nombre *</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="Nombre de la comisión"
+              />
             </div>
 
-            {/* ✅ Campo para secretario */}
             <div className="space-y-2">
-              <Label htmlFor="secretaryId">Secretario</Label>
-              <Select
-                value={formData.secretaryId}
-                onValueChange={(value: string) => handleSelectChange("secretaryId", value)}
-              >
-                <SelectTrigger id="secretaryId">
-                  <SelectValue placeholder="Seleccionar secretario" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin secretario</SelectItem>
-                  {concejales.map((concejal) => (
-                    <SelectItem key={concejal.id} value={concejal.id.toString()}>
-                      {concejal.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="description">Descripción</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Descripción de la comisión"
+                rows={3}
+              />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label>Miembros</Label>
-            <AntdSelect
-              mode="multiple"
-              allowClear
-              style={{ width: '100%' }}
-              placeholder="Agregar miembros"
-              value={selectedMembers}
-              onChange={(values) => setSelectedMembers(values)}
-              optionLabelProp="label"
-              options={concejales.map((concejal) => ({
-                value: concejal.id.toString(),
-                label: concejal.name,
-              }))}
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="presidentId">Presidente</Label>
+                <Select
+                  value={formData.presidentId}
+                  onValueChange={(value: string) => handleSelectChange("presidentId", value)}
+                >
+                  <SelectTrigger id="presidentId">
+                    <SelectValue placeholder="Seleccionar presidente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sin presidente</SelectItem>
+                    {concejales.map((concejal) => (
+                      <SelectItem key={concejal.id} value={concejal.id.toString()}>
+                        {concejal.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="isActive"
-              name="isActive"
-              checked={formData.isActive}
-              onCheckedChange={(checked: any) => setFormData({ ...formData, isActive: !!checked })}
-            />
-            <Label htmlFor="isActive">Activa</Label>
-          </div>
+              {/* ✅ Campo para secretario */}
+              <div className="space-y-2">
+                <Label htmlFor="secretaryId">Secretario</Label>
+                <Select
+                  value={formData.secretaryId}
+                  onValueChange={(value: string) => handleSelectChange("secretaryId", value)}
+                >
+                  <SelectTrigger id="secretaryId">
+                    <SelectValue placeholder="Seleccionar secretario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sin secretario</SelectItem>
+                    {concejales.map((concejal) => (
+                      <SelectItem key={concejal.id} value={concejal.id.toString()}>
+                        {concejal.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-          {/* Bloque desplegable para agregar proyectos */}
-          <div className="border rounded-lg mb-6">
-            <button
-              type="button"
-              className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 text-left"
-              onClick={() => setShowProyectos(v => !v)}
-            >
-              <span className="font-semibold text-[#0e4c7d]">Agregar proyectos</span>
-              {showProyectos ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
-            {showProyectos && (
-              <div className="p-4 space-y-4">
-                {/* Formulario para agregar proyecto */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                  <div>
-                    <Label>Expte N°</Label>
-                    <Input
-                      value={nuevoProyecto.expedienteNumber}
-                      onChange={e => setNuevoProyecto(p => ({ ...p, expedienteNumber: e.target.value }))}
-                      placeholder="Ej: 1234/2024"
-                    />
-                  </div>
-                  <div>
-                    <Label>Fecha de entrada</Label>
-                    <DatePicker
-                      value={nuevoProyecto.fechaEntrada}
-                      format="DD-MM-YYYY"
-                      locale={esES}
-                      onChange={(date) =>
-                        setNuevoProyecto(p => ({
-                          ...p,
-                          fechaEntrada: date && date.isValid() ? date : null
-                        }))
-                      }
-                      allowClear={false}
-                      style={{ width: '100%' }}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <Label>Descripción</Label>
-                    <Textarea
-                      value={nuevoProyecto.descripcion}
-                      onChange={e => setNuevoProyecto(p => ({ ...p, descripcion: e.target.value }))}
-                      placeholder="Descripción del proyecto en comisión"
-                      rows={2}
-                    />
-                  </div>
-                  <div>
-                    <Label>Despacho</Label>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={nuevoProyecto.despacho}
-                        onCheckedChange={v => setNuevoProyecto(p => ({ ...p, despacho: v }))}
-                      />
-                      <span>{nuevoProyecto.despacho ? "Sí" : "No"}</span>
-                    </div>
-                  </div>
-                  {nuevoProyecto.despacho && (
+            <div className="space-y-2">
+              <Label>Miembros</Label>
+              <AntdSelect
+                mode="multiple"
+                allowClear
+                style={{ width: '100%' }}
+                placeholder="Agregar miembros"
+                value={selectedMembers}
+                onChange={(values) => setSelectedMembers(values)}
+                optionLabelProp="label"
+                options={concejales.map((concejal) => ({
+                  value: concejal.id.toString(),
+                  label: concejal.name,
+                }))}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isActive"
+                name="isActive"
+                checked={formData.isActive}
+                onCheckedChange={(checked: any) => setFormData({ ...formData, isActive: !!checked })}
+              />
+              <Label htmlFor="isActive">Activa</Label>
+            </div>
+
+            {/* Bloque desplegable para agregar proyectos */}
+            <div className="border rounded-lg mb-6">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 text-left"
+                onClick={() => setShowProyectos(v => !v)}
+              >
+                <span className="font-semibold text-[#0e4c7d]">Agregar proyectos</span>
+                {showProyectos ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              </button>
+              {showProyectos && (
+                <div className="p-4 space-y-4">
+                  {/* Formulario para agregar proyecto */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                     <div>
-                      <Label>Fecha de despacho</Label>
+                      <Label>Expte N°</Label>
+                      <Input
+                        value={nuevoProyecto.expedienteNumber}
+                        onChange={e => setNuevoProyecto(p => ({ ...p, expedienteNumber: e.target.value }))}
+                        placeholder="Ej: 1234/2024"
+                      />
+                    </div>
+                    <div>
+                      <Label>Fecha de entrada</Label>
                       <DatePicker
-                        value={nuevoProyecto.fechaDespacho}
+                        value={nuevoProyecto.fechaEntrada}
                         format="DD-MM-YYYY"
                         locale={esES}
                         onChange={(date) =>
                           setNuevoProyecto(p => ({
                             ...p,
-                            fechaDespacho: date && date.isValid() ? date : null
+                            fechaEntrada: date && date.isValid() ? date : null
                           }))
                         }
                         allowClear={false}
                         style={{ width: '100%' }}
                       />
                     </div>
-                  )}
-                  <div className="md:col-span-2">
-                    <Label>Adjuntar archivo (PDF)</Label>
-                    <Input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={e => setNuevoProyecto(p => ({ ...p, archivo: e.target.files?.[0] || null }))}
-                    />
-                    {nuevoProyecto.archivo && (
-                      <div className="text-xs text-gray-600 mt-1">Archivo seleccionado: {nuevoProyecto.archivo.name}</div>
+                    <div className="md:col-span-2">
+                      <Label>Descripción</Label>
+                      <Textarea
+                        value={nuevoProyecto.descripcion}
+                        onChange={e => setNuevoProyecto(p => ({ ...p, descripcion: e.target.value }))}
+                        placeholder="Descripción del proyecto en comisión"
+                        rows={2}
+                      />
+                    </div>
+                    <div>
+                      <Label>Despacho</Label>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={nuevoProyecto.despacho}
+                          onCheckedChange={v => setNuevoProyecto(p => ({ ...p, despacho: v }))}
+                        />
+                        <span>{nuevoProyecto.despacho ? "Sí" : "No"}</span>
+                      </div>
+                    </div>
+                    {nuevoProyecto.despacho && (
+                      <div>
+                        <Label>Fecha de despacho</Label>
+                        <DatePicker
+                          value={nuevoProyecto.fechaDespacho}
+                          format="DD-MM-YYYY"
+                          locale={esES}
+                          onChange={(date) =>
+                            setNuevoProyecto(p => ({
+                              ...p,
+                              fechaDespacho: date && date.isValid() ? date : null
+                            }))
+                          }
+                          allowClear={false}
+                          style={{ width: '100%' }}
+                        />
+                      </div>
                     )}
+                    <div className="md:col-span-2">
+                      <Label>Adjuntar archivo (PDF)</Label>
+                      <Input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={e => setNuevoProyecto(p => ({ ...p, archivo: e.target.files?.[0] || null }))}
+                      />
+                      {nuevoProyecto.archivo && (
+                        <div className="text-xs text-gray-600 mt-1">Archivo seleccionado: {nuevoProyecto.archivo.name}</div>
+                      )}
+                    </div>
+                    <div className="md:col-span-2 flex justify-end">
+                      <Button type="button" onClick={handleAddProyecto} disabled={!nuevoProyecto.expedienteNumber || !nuevoProyecto.fechaEntrada || !nuevoProyecto.descripcion}>
+                        Agregar proyecto
+                      </Button>
+                    </div>
                   </div>
-                  <div className="md:col-span-2 flex justify-end">
-                    <Button type="button" onClick={handleAddProyecto} disabled={!nuevoProyecto.expedienteNumber || !nuevoProyecto.fechaEntrada || !nuevoProyecto.descripcion}>
-                      Agregar proyecto
-                    </Button>
-                  </div>
-                </div>
-                {/* Lista de proyectos agregados (antes de guardar) */}
-                {proyectos.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="font-semibold mb-2">Proyectos agregados</h4>
-                    <ul className="space-y-2">
-                      {proyectos.map((p, idx) => (
-                        <li key={idx} className="flex items-center gap-4 bg-gray-50 rounded p-2">
-                          <div className="flex-1">
-                            <div className="font-medium">Expte N°: {p.expedienteNumber}</div>
-                            <div className="text-sm text-gray-600">Fecha entrada: {p.fechaEntrada ? dayjs(p.fechaEntrada, "YYYY-MM-DD").format("DD-MM-YYYY") : ""}</div>
-                            <div className="text-sm text-gray-600">{p.descripcion}</div>
-                            <div className="text-sm">Despacho: {p.despacho ? `Sí${p.fechaDespacho ? ` (${p.fechaDespacho})` : ""}` : "No"}</div>
-                            {p.archivo && (
-                              <div className="text-xs text-gray-600 mt-1">Archivo: {p.archivo.name}</div>
-                            )}
-                          </div>
-                          <button type="button" onClick={() => handleRemoveProyecto(idx)} className="text-red-600 hover:text-red-800">
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Bloque desplegable de proyectos en comisión (tabla editable) */}
-          <div className="border rounded-lg mt-6">
-            <button
-              type="button"
-              className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 text-left"
-              onClick={() => setShowTablaProyectos(v => !v)}
-            >
-              <span className="font-semibold text-[#0e4c7d]">Proyectos en comisión</span>
-              {showTablaProyectos ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-            </button>
-            {showTablaProyectos && (
-              <div className="p-4">
-                {editProyectos.length === 0 ? (
-                  <div className="text-gray-500">No hay proyectos en comisión.</div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border text-sm">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-2 py-2 border text-center w-[50px]">Expte N°</th>
-                          <th className="px-3 py-2 border text-center w-[120px]">Fecha entrada</th>
-                          <th className="px-3 py-2 border text-center w-2/4">Descripción</th>
-                          <th className="px-2 py-2 border text-center w-[50px]">Despacho</th>
-                          <th className="px-3 py-2 border text-center w-[120px]">Fecha despacho</th>
-                          <th className="px-2 py-2 border text-center w-[50px]">Archivo</th>
-                          <th className="px-2 py-2 border text-center w-[50px]">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {editProyectos.map((p, idx) => (
-                          <tr key={idx} className="align-middle">
-                            <td className="border px-3 py-2 text-center align-middle">{p.expedienteNumber}</td>
-                            <td className="border px-3 py-2 text-center align-middle">
-                              <DatePicker
-                                value={p.fechaEntrada && dayjs.isDayjs(p.fechaEntrada) ? p.fechaEntrada : (p.fechaEntrada ? dayjs(p.fechaEntrada, "YYYY-MM-DD") : null)}
-                                format="DD-MM-YYYY"
-                                locale={esES}
-                                onChange={(date) =>
-                                  handleEditProyectoChange(idx, "fechaEntrada", date && date.isValid() ? date : null)
-                                }
-                                allowClear={false}
-                                style={{ width: '100%' }}
-                              />
-                            </td>
-                            <td className="border px-3 py-2 text-center align-middle">{p.descripcion}</td>
-                            <td className="border px-3 py-2 text-center align-middle">
-                              <div className="flex items-center justify-center">
-                                <Switch
-                                  checked={!!p.despacho}
-                                  onCheckedChange={v => handleEditProyectoChange(idx, "despacho", v)}
-                                />
-                              </div>
-                            </td>
-                            <td className="border px-3 py-2 text-center align-middle">
-                              <DatePicker
-                                value={p.fechaDespacho && dayjs.isDayjs(p.fechaDespacho) ? p.fechaDespacho : (p.fechaDespacho ? dayjs(p.fechaDespacho, "YYYY-MM-DD") : null)}
-                                format="DD-MM-YYYY"
-                                locale={esES}
-                                onChange={(date) =>
-                                  handleEditProyectoChange(idx, "fechaDespacho", date && date.isValid() ? date : null)
-                                }
-                                allowClear={false}
-                                style={{ width: '100%' }}
-                                disabled={!p.despacho}
-                              />
-                            </td>
-                            <td className="border px-3 py-2 text-center align-middle">
-                              {p.fileUrl ? (
-                                <div className="flex items-center justify-center gap-2">
-                                  <a
-                                    href={p.fileUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 flex items-center justify-center"
-                                    title="Ver archivo"
-                                  >
-                                    <Eye className="w-5 h-5" />
-                                  </a>
-                                  <a
-                                    href={p.fileUrl}
-                                    download
-                                    className="text-green-600 hover:text-green-800 flex items-center justify-center"
-                                    title="Descargar archivo"
-                                  >
-                                    <Download className="w-5 h-5" />
-                                  </a>
-                                </div>
-                              ) : (
-                                <span className="text-gray-400">—</span>
+                  {/* Lista de proyectos agregados (antes de guardar) */}
+                  {proyectos.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold mb-2">Proyectos agregados</h4>
+                      <ul className="space-y-2">
+                        {proyectos.map((p, idx) => (
+                          <li key={idx} className="flex items-center gap-4 bg-gray-50 rounded p-2">
+                            <div className="flex-1">
+                              <div className="font-medium">Expte N°: {p.expedienteNumber}</div>
+                              <div className="text-sm text-gray-600">Fecha entrada: {p.fechaEntrada ? dayjs(p.fechaEntrada, "YYYY-MM-DD").format("DD-MM-YYYY") : ""}</div>
+                              <div className="text-sm text-gray-600">{p.descripcion}</div>
+                              <div className="text-sm">Despacho: {p.despacho ? `Sí${p.fechaDespacho ? ` (${p.fechaDespacho})` : ""}` : "No"}</div>
+                              {p.archivo && (
+                                <div className="text-xs text-gray-600 mt-1">Archivo: {p.archivo.name}</div>
                               )}
-                            </td>
-                            <td className="border px-3 py-2 text-center align-middle">
-                              <div className="flex items-center justify-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleSaveProyecto(idx)}
-                                  disabled={savingProyecto === idx}
-                                  className={`${savingProyecto === idx ? 'text-gray-400 cursor-not-allowed border-0' : 'text-blue-600 hover:text-blue-800 border-0'}`}
-                                  title="Guardar"
-                                  style={{ border: 0 }}
-                                >
-                                  {savingProyecto === idx ? (
-                                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                                  ) : (
-                                    <Save className="w-5 h-5" />
-                                  )}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteProyecto(idx)}
-                                  disabled={deletingProyecto === idx}
-                                  className={`${deletingProyecto === idx ? 'text-gray-400 cursor-not-allowed border-0' : 'text-red-600 hover:text-red-800 border-0'}`}
-                                  title="Eliminar"
-                                  style={{ border: 0 }}
-                                >
-                                  {deletingProyecto === idx ? (
-                                    <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                                  ) : (
-                                    <Trash2 className="w-5 h-5" />
-                                  )}
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
+                            </div>
+                            <button type="button" onClick={() => handleRemoveProyecto(idx)} className="text-red-600 hover:text-red-800">
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </li>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
-          <div className="flex justify-end space-x-4">
-            <Button type="button" variant="outline" onClick={() => router.back()} disabled={isSubmitting}>
-              Cancelar
-            </Button>
-            <Button type="submit" className="bg-[#0e4c7d] hover:bg-[#0a3d68]" disabled={isSubmitting}>
-              {isSubmitting ? "Guardando..." : comision ? "Actualizar" : "Crear"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+            {/* Bloque desplegable de proyectos en comisión (tabla editable) */}
+            <div className="border rounded-lg mt-6">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 text-left"
+                onClick={() => setShowTablaProyectos(v => !v)}
+              >
+                <span className="font-semibold text-[#0e4c7d]">Proyectos en comisión</span>
+                {showTablaProyectos ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+              </button>
+              {showTablaProyectos && (
+                <div className="p-4">
+                  {editProyectos.length === 0 ? (
+                    <div className="text-gray-500">No hay proyectos en comisión.</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border text-sm">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-2 border text-center w-[50px]">Expte N°</th>
+                            <th className="px-3 py-2 border text-center w-[120px]">Fecha entrada</th>
+                            <th className="px-3 py-2 border text-center w-2/4">Descripción</th>
+                            <th className="px-2 py-2 border text-center w-[50px]">Despacho</th>
+                            <th className="px-3 py-2 border text-center w-[120px]">Fecha despacho</th>
+                            <th className="px-2 py-2 border text-center w-[50px]">Archivo</th>
+                            <th className="px-2 py-2 border text-center w-[50px]">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {editProyectos.map((p, idx) => (
+                            <tr key={idx} className="align-middle">
+                              <td className="border px-3 py-2 text-center align-middle">{p.expedienteNumber}</td>
+                              <td className="border px-3 py-2 text-center align-middle">
+                                <DatePicker
+                                  value={p.fechaEntrada && dayjs.isDayjs(p.fechaEntrada) ? p.fechaEntrada : (p.fechaEntrada ? dayjs(p.fechaEntrada, "YYYY-MM-DD") : null)}
+                                  format="DD-MM-YYYY"
+                                  locale={esES}
+                                  onChange={(date) =>
+                                    handleEditProyectoChange(idx, "fechaEntrada", date && date.isValid() ? date : null)
+                                  }
+                                  allowClear={false}
+                                  style={{ width: '100%' }}
+                                />
+                              </td>
+                              <td className="border px-3 py-2 text-center align-middle">{p.descripcion}</td>
+                              <td className="border px-3 py-2 text-center align-middle">
+                                <div className="flex items-center justify-center">
+                                  <Switch
+                                    checked={!!p.despacho}
+                                    onCheckedChange={v => handleEditProyectoChange(idx, "despacho", v)}
+                                  />
+                                </div>
+                              </td>
+                              <td className="border px-3 py-2 text-center align-middle">
+                                <DatePicker
+                                  value={p.fechaDespacho && dayjs.isDayjs(p.fechaDespacho) ? p.fechaDespacho : (p.fechaDespacho ? dayjs(p.fechaDespacho, "YYYY-MM-DD") : null)}
+                                  format="DD-MM-YYYY"
+                                  locale={esES}
+                                  onChange={(date) =>
+                                    handleEditProyectoChange(idx, "fechaDespacho", date && date.isValid() ? date : null)
+                                  }
+                                  allowClear={false}
+                                  style={{ width: '100%' }}
+                                  disabled={!p.despacho}
+                                />
+                              </td>
+                              <td className="border px-3 py-2 text-center align-middle">
+                                {p.fileUrl ? (
+                                  <div className="flex items-center justify-center gap-2">
+                                    <a
+                                      href={p.fileUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:text-blue-800 flex items-center justify-center"
+                                      title="Ver archivo"
+                                    >
+                                      <Eye className="w-5 h-5" />
+                                    </a>
+                                    <a
+                                      href={p.fileUrl}
+                                      download
+                                      className="text-green-600 hover:text-green-800 flex items-center justify-center"
+                                      title="Descargar archivo"
+                                    >
+                                      <Download className="w-5 h-5" />
+                                    </a>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-400">—</span>
+                                )}
+                              </td>
+                              <td className="border px-3 py-2 text-center align-middle">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSaveProyecto(idx)}
+                                    disabled={savingProyecto === idx}
+                                    className={`${savingProyecto === idx ? 'text-gray-400 cursor-not-allowed border-0' : 'text-blue-600 hover:text-blue-800 border-0'}`}
+                                    title="Guardar"
+                                    style={{ border: 0 }}
+                                  >
+                                    {savingProyecto === idx ? (
+                                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Save className="w-5 h-5" />
+                                    )}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteProyecto(idx)}
+                                    disabled={deletingProyecto === idx}
+                                    className={`${deletingProyecto === idx ? 'text-gray-400 cursor-not-allowed border-0' : 'text-red-600 hover:text-red-800 border-0'}`}
+                                    title="Eliminar"
+                                    style={{ border: 0 }}
+                                  >
+                                    {deletingProyecto === idx ? (
+                                      <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Trash2 className="w-5 h-5" />
+                                    )}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <Button type="button" variant="outline" onClick={() => router.back()} disabled={isSubmitting}>
+                Cancelar
+              </Button>
+              <Button type="submit" className="bg-[#0e4c7d] hover:bg-[#0a3d68]" disabled={isSubmitting}>
+                {isSubmitting ? "Guardando..." : comision ? "Actualizar" : "Crear"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
   )
 }

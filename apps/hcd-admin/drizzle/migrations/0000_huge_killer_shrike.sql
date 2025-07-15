@@ -1,5 +1,13 @@
-CREATE TYPE "public"."document_type" AS ENUM('ordenanza', 'decreto', 'resolucion', 'comunicacion');--> statement-breakpoint
-CREATE TYPE "public"."session_type" AS ENUM('ordinaria', 'extraordinaria', 'especial', 'preparatoria');--> statement-breakpoint
+DO $$ BEGIN
+    CREATE TYPE "public"."document_type" AS ENUM('ordenanza', 'decreto', 'resolucion', 'comunicacion');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+    CREATE TYPE "public"."session_type" AS ENUM('ordinaria', 'extraordinaria', 'especial', 'preparatoria');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;--> statement-breakpoint
 CREATE TABLE "activities" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" varchar(255) NOT NULL,

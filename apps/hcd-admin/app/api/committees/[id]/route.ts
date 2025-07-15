@@ -30,6 +30,12 @@ export async function GET(
       .innerJoin(councilMembers, eq(committeeMembers.councilMemberId, councilMembers.id))
       .where(eq(committeeMembers.committeeId, id))
 
+    // Mapear a formato seguro para el frontend
+    const members = miembros.map(m => ({
+      id: m.councilMemberId,
+      name: m.name ?? ""
+    }))
+
     // Traer el secretario/a del HCD si está presente
     let secretaryHcd = null
     if (comision && comision.secretaryHcdId) {
@@ -39,7 +45,7 @@ export async function GET(
       }
     }
 
-    return NextResponse.json({ ...comision, miembros, secretaryHcd }, { headers: { "Cache-Control": "no-store" } })
+    return NextResponse.json({ ...comision, members, secretaryHcd }, { headers: { "Cache-Control": "no-store" } })
   } catch (error) {
     console.error("Error fetching committee:", error)
     return NextResponse.json({ error: "Error al obtener la comisión" }, { status: 500, headers: { "Cache-Control": "no-store" } })
