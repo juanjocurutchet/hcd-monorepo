@@ -674,7 +674,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                       <DatePicker
                         value={nuevoProyecto.fechaEntrada}
                         format="DD-MM-YYYY"
-                        locale={esES}
+                        locale={esES as any}
                         onChange={(date) =>
                           setNuevoProyecto(p => ({
                             ...p,
@@ -850,7 +850,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                                   <DatePicker
                                     value={p.fechaEntrada && dayjs.isDayjs(p.fechaEntrada) ? p.fechaEntrada : (p.fechaEntrada ? dayjs(p.fechaEntrada, "YYYY-MM-DD") : null)}
                                     format="DD-MM-YYYY"
-                                    locale={esES}
+                                    locale={esES as any}
                                     onChange={(date) => handleEditProyectoChange(idx, "fechaEntrada", date && date.isValid() ? date : null)}
                                     allowClear={false}
                                     style={{ width: '100%' }}
