@@ -118,6 +118,7 @@ export const sessionFiles = pgTable("session_files", {
   fileUrl: varchar("file_url", { length: 255 }),
   origen: varchar("origen", { length: 50 }).notNull(),
   prefijoOrigen: varchar("prefijo_origen", { length: 20 }).notNull(),
+  autor: varchar("autor", { length: 255 }),
   tipo: varchar("tipo", { length: 100 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

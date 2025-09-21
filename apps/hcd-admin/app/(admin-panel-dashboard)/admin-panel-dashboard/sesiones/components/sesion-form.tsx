@@ -18,14 +18,21 @@ import SessionProviderWrapper from "../../../../admin-panel/SessionProviderWrapp
 
 // Mapeo de orígenes a prefijos predefinidos
 const ORIGEN_PREFIX_MAP: { [key: string]: string } = {
-  "Bloque Todos Por Las Flores": "FTxLF",
-  "Bloque Adelante Juntos": "AJ",
-  "Bloque La Libertad Avanza": "LLA",
+  "Todos por Las Flores": "FTxLF",
+  "Adelante Juntos ": "AJ",
+  "La Libertad Avanza": "LLA",
   "Departamento Ejecutivo": "DE",
   "Comunicaciones oficiales": "COF",
   "Parlamento Estudiantil": "PE",
   "Vecinos": "V"
 }
+
+// Lista de orígenes que son bloques políticos
+const BLOQUES_POLITICOS = [
+  "Todos por Las Flores",
+  "Adelante Juntos ", 
+  "La Libertad Avanza"
+]
 
 interface Sesion {
   id?: string;
@@ -64,6 +71,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
     origen: "",
     origenPersonalizado: "",
     prefijoOrigen: "",
+    autor: "",
     tipo: "",
     tipoPersonalizado: "",
     archivo: null as File | null,
@@ -78,6 +86,32 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
   const [editTipoPersonalizado, setEditTipoPersonalizado] = useState<{ [key: number]: string }>({})
   const [editingProyecto, setEditingProyecto] = useState<number | null>(null)
   const [proyectoError, setProyectoError] = useState("")
+  
+  // Estado para manejo de bloques políticos
+  const [blockMembers, setBlockMembers] = useState<any[]>([])
+  const [loadingMembers, setLoadingMembers] = useState(false)
+
+  // Función para verificar si el origen es un bloque
+  const isBloque = (origen: string) => BLOQUES_POLITICOS.includes(origen)
+
+  // Función para cargar integrantes del bloque
+  const loadBlockMembers = async (blockName: string) => {
+    setLoadingMembers(true)
+    try {
+      const response = await fetch(`/api/blocks/members?block=${encodeURIComponent(blockName)}`)
+      if (response.ok) {
+        const data = await response.json()
+        setBlockMembers(data.members || [])
+      } else {
+        setBlockMembers([])
+      }
+    } catch (error) {
+      console.error('Error loading block members:', error)
+      setBlockMembers([])
+    } finally {
+      setLoadingMembers(false)
+    }
+  }
 
   // Cargar proyectos existentes al editar
   useEffect(() => {
@@ -204,7 +238,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
   const handleAddProyecto = async () => {
     const origenFinal = nuevoProyecto.origen === "otros" ? nuevoProyecto.origenPersonalizado : nuevoProyecto.origen
     const tipoFinal = nuevoProyecto.tipo === "otro" ? nuevoProyecto.tipoPersonalizado : nuevoProyecto.tipo
-    if (!nuevoProyecto.numeroExpediente || !nuevoProyecto.fechaEntrada || !nuevoProyecto.titulo || !origenFinal || !nuevoProyecto.prefijoOrigen || !tipoFinal) {
+    if (!nuevoProyecto.numeroExpediente || !nuevoProyecto.fechaEntrada || !nuevoProyecto.titulo || !origenFinal || !nuevoProyecto.prefijoOrigen || !nuevoProyecto.autor || !tipoFinal) {
       setProyectoError("Todos los campos obligatorios deben estar completos")
       return
     }
@@ -221,6 +255,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
         fd.append("descripcion", nuevoProyecto.descripcion)
         fd.append("origen", origenFinal)
         fd.append("prefijoOrigen", nuevoProyecto.prefijoOrigen)
+        fd.append("autor", nuevoProyecto.autor)
         fd.append("tipo", tipoFinal)
         if (nuevoProyecto.archivo) fd.append("archivo", nuevoProyecto.archivo)
 
@@ -236,6 +271,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
             origen: "",
             origenPersonalizado: "",
             prefijoOrigen: "",
+            autor: "",
             tipo: "",
             tipoPersonalizado: "",
             archivo: null
@@ -269,6 +305,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
         origen: "",
         origenPersonalizado: "",
         prefijoOrigen: "",
+        autor: "",
         tipo: "",
         tipoPersonalizado: "",
         archivo: null
@@ -348,6 +385,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
       fd.append("descripcion", proyecto.descripcion || "")
       fd.append("origen", origenFinal)
       fd.append("prefijoOrigen", proyecto.prefijoOrigen)
+      fd.append("autor", proyecto.autor || "")
       fd.append("tipo", tipoFinal)
 
       const res = await fetch(`/api/sessions/${sesion.id}/files`, {
@@ -380,8 +418,20 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
       ...prev,
       origen: value,
       prefijoOrigen: prefijo,
-      origenPersonalizado: "" // Limpiar el campo personalizado si cambia el origen
+      origenPersonalizado: "", // Limpiar el campo personalizado si cambia el origen
+      autor: "" // Limpiar el autor al cambiar origen
     }))
+
+    // Si es un bloque, cargar sus integrantes
+    if (isBloque(value)) {
+      loadBlockMembers(value)
+    } else {
+      // Si no es bloque, usar el propio origen como autor
+      setBlockMembers([])
+      if (value !== "otros") {
+        setNuevoProyecto(prev => ({ ...prev, autor: value }))
+      }
+    }
   }
 
   // Función para manejar el cambio de origen en la tabla editable
@@ -695,9 +745,9 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                           <SelectValue placeholder="Seleccionar origen" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Bloque Todos Por Las Flores">Bloque Todos Por Las Flores</SelectItem>
-                          <SelectItem value="Bloque Adelante Juntos">Bloque Adelante Juntos</SelectItem>
-                          <SelectItem value="Bloque La Libertad Avanza">Bloque La Libertad Avanza</SelectItem>
+                          <SelectItem value="Todos por Las Flores">Todos por Las Flores</SelectItem>
+                          <SelectItem value="Adelante Juntos ">Adelante Juntos </SelectItem>
+                          <SelectItem value="La Libertad Avanza">La Libertad Avanza</SelectItem>
                           <SelectItem value="Departamento Ejecutivo">Departamento Ejecutivo</SelectItem>
                           <SelectItem value="Comunicaciones oficiales">Comunicaciones oficiales</SelectItem>
                           <SelectItem value="Parlamento Estudiantil">Parlamento Estudiantil</SelectItem>
@@ -716,6 +766,41 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                         />
                       </div>
                     )}
+                    <div>
+                      <Label>Autor *</Label>
+                      {isBloque(nuevoProyecto.origen) ? (
+                        <Select
+                          value={nuevoProyecto.autor}
+                          onValueChange={(value) => setNuevoProyecto(p => ({ ...p, autor: value }))}
+                          disabled={loadingMembers}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={loadingMembers ? "Cargando..." : "Seleccionar autor"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {blockMembers.map((member) => (
+                              <SelectItem key={member.id} value={member.name}>
+                                {member.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : nuevoProyecto.origen === "otros" ? (
+                        <Input
+                          value={nuevoProyecto.autor}
+                          onChange={e => setNuevoProyecto(p => ({ ...p, autor: e.target.value }))}
+                          placeholder="Ingrese el autor"
+                        />
+                      ) : (
+                        <Input
+                          value={nuevoProyecto.autor}
+                          onChange={e => setNuevoProyecto(p => ({ ...p, autor: e.target.value }))}
+                          placeholder="Autor"
+                          readOnly
+                          className="bg-gray-100"
+                        />
+                      )}
+                    </div>
                     <div>
                       <Label>Tipo *</Label>
                       <Select

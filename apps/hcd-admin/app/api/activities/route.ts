@@ -1,12 +1,34 @@
 import { db } from "@/lib/db-singleton"
 import { activities } from "@/lib/db/schema"
+import { and, eq, gte } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const url = new URL(request.url)
+    const showAll = url.searchParams.get('showAll') === 'true'
+    const onlyPublished = url.searchParams.get('onlyPublished') !== 'false' // por defecto true
+    
+    // Obtener fecha actual en zona horaria de Argentina
+    const nowUTC = new Date()
+    const now = new Date(nowUTC.toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' }))
+    
+    let whereConditions = []
+    
+    // Filtrar solo actividades publicadas (por defecto)
+    if (onlyPublished) {
+      whereConditions.push(eq(activities.isPublished, true))
+    }
+    
+    // Filtrar solo actividades futuras (por defecto, a menos que se especifique showAll)
+    if (!showAll) {
+      whereConditions.push(gte(activities.date, now))
+    }
+    
     const result = await db
       .select()
       .from(activities)
+      .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
       .orderBy(activities.date)
 
     return NextResponse.json(result)

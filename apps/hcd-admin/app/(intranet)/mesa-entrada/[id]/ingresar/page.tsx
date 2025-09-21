@@ -7,13 +7,13 @@ import esES from "antd/locale/es_ES";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Mapeo de orígenes a prefijos predefinidos
 const ORIGEN_PREFIX_MAP: { [key: string]: string } = {
-  "Bloque Todos Por Las Flores": "FTxLF",
-  "Bloque Adelante Juntos": "AJ",
-  "Bloque La Libertad Avanza": "LLA",
+  "Todos por Las Flores": "FTxLF",
+  "Adelante Juntos ": "AJ",
+  "La Libertad Avanza": "LLA",
   "Departamento Ejecutivo": "DE",
   "Comunicaciones oficiales": "COF",
   "Parlamento Estudiantil": "PE",
@@ -23,25 +23,58 @@ const ORIGEN_PREFIX_MAP: { [key: string]: string } = {
 export default function IngresarProyectoPage() {
   const params = useParams();
   const sesionId = params?.id;
-  const [form, setForm] = useState({
-    numeroExpediente: "",
+  const defaultForm = {
     fechaEntrada: dayjs(),
     titulo: "",
     descripcion: "",
     origen: "",
     origenPersonalizado: "",
     prefijoOrigen: "",
+    autor: "",
     tipo: "",
     tipoPersonalizado: "",
     archivo: null as File | null,
-  });
+  };
+  const [form, setForm] = useState(defaultForm);
+  const [expedienteGenerado, setExpedienteGenerado] = useState<string>("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [blockMembers, setBlockMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Lista de orígenes que son bloques políticos
+  const BLOQUES_POLITICOS = [
+    "Todos por Las Flores",
+    "Adelante Juntos ", 
+    "La Libertad Avanza"
+  ];
+
+  // Función para verificar si el origen es un bloque
+  const isBloque = (origen: string) => BLOQUES_POLITICOS.includes(origen);
+
+  // Función para cargar integrantes del bloque
+  const loadBlockMembers = async (blockName: string) => {
+    setLoadingMembers(true);
+    try {
+      const response = await fetch(`/api/blocks/members?block=${encodeURIComponent(blockName)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setBlockMembers(data.members || []);
+      } else {
+        setBlockMembers([]);
+      }
+    } catch (error) {
+      console.error('Error loading block members:', error);
+      setBlockMembers([]);
+    } finally {
+      setLoadingMembers(false);
+    }
   };
 
   // Función para manejar el cambio de origen y actualizar automáticamente el prefijo
@@ -51,8 +84,20 @@ export default function IngresarProyectoPage() {
       ...prev,
       origen: value,
       prefijoOrigen: prefijo,
-      origenPersonalizado: "" // Limpiar el campo personalizado si cambia el origen
+      origenPersonalizado: "", // Limpiar el campo personalizado si cambia el origen
+      autor: "" // Limpiar el autor al cambiar origen
     }));
+
+    // Si es un bloque, cargar sus integrantes
+    if (isBloque(value)) {
+      loadBlockMembers(value);
+    } else {
+      // Si no es bloque, usar el propio origen como autor
+      setBlockMembers([]);
+      if (value !== "otros") {
+        setForm((prev) => ({ ...prev, autor: value }));
+      }
+    }
   };
 
   const handleDateChange = (date: any) => {
@@ -72,11 +117,12 @@ export default function IngresarProyectoPage() {
     setSuccess("");
     setLoading(true);
 
-    // Validaciones básicas
+    // Validaciones básicas (sin numeroExpediente)
     const origenFinal = form.origen === "otros" ? form.origenPersonalizado : form.origen;
     const tipoFinal = form.tipo === "otro" ? form.tipoPersonalizado : form.tipo;
+    const autorFinal = form.autor || origenFinal;
 
-    if (!form.numeroExpediente || !form.fechaEntrada || !form.titulo || !origenFinal || !form.prefijoOrigen || !tipoFinal) {
+    if (!form.fechaEntrada || !form.titulo || !origenFinal || !form.prefijoOrigen || !tipoFinal || !autorFinal) {
       setError("Todos los campos obligatorios deben estar completos");
       setLoading(false);
       return;
@@ -84,12 +130,12 @@ export default function IngresarProyectoPage() {
 
     try {
       const formData = new FormData();
-      formData.append("numeroExpediente", form.numeroExpediente);
       formData.append("fechaEntrada", form.fechaEntrada.format("YYYY-MM-DD"));
       formData.append("titulo", form.titulo);
       formData.append("descripcion", form.descripcion);
       formData.append("origen", origenFinal);
       formData.append("prefijoOrigen", form.prefijoOrigen);
+      formData.append("autor", autorFinal);
       formData.append("tipo", tipoFinal);
 
       if (form.archivo) {
@@ -102,19 +148,10 @@ export default function IngresarProyectoPage() {
       });
 
       if (response.ok) {
-        setSuccess("Proyecto ingresado correctamente");
-        setForm({
-          numeroExpediente: "",
-          fechaEntrada: dayjs(),
-          titulo: "",
-          descripcion: "",
-          origen: "",
-          origenPersonalizado: "",
-          prefijoOrigen: "",
-          tipo: "",
-          tipoPersonalizado: "",
-          archivo: null,
-        });
+        const data = await response.json();
+        setSuccess(`Proyecto ingresado correctamente. Número de expediente: ${data.numeroExpediente}`);
+        setExpedienteGenerado(data.numeroExpediente || "");
+        setForm(defaultForm);
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Error al ingresar el proyecto");
@@ -137,6 +174,10 @@ export default function IngresarProyectoPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
+              <label className="block text-sm font-semibold text-blue-900 mb-1">N° de expediente</label>
+              <Input value={expedienteGenerado || "(se asignará automáticamente)"} readOnly disabled className="bg-gray-100" />
+            </div>
+            <div>
               <label className="block text-sm font-semibold text-blue-900 mb-1">Fecha de ingreso *</label>
               <DatePicker
                 value={form.fechaEntrada}
@@ -146,10 +187,6 @@ export default function IngresarProyectoPage() {
                 allowClear={false}
                 style={{ width: '100%' }}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-blue-900 mb-1">Expediente *</label>
-              <Input name="numeroExpediente" value={form.numeroExpediente} onChange={handleChange} placeholder="Ej: 135/2025" />
             </div>
           </div>
 
@@ -177,9 +214,9 @@ export default function IngresarProyectoPage() {
                   <SelectValue placeholder="Seleccionar origen" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Bloque Todos Por Las Flores">Bloque Todos Por Las Flores</SelectItem>
-                  <SelectItem value="Bloque Adelante Juntos">Bloque Adelante Juntos</SelectItem>
-                  <SelectItem value="Bloque La Libertad Avanza">Bloque La Libertad Avanza</SelectItem>
+                  <SelectItem value="Todos por Las Flores">Todos por Las Flores</SelectItem>
+                  <SelectItem value="Adelante Juntos ">Adelante Juntos</SelectItem>
+                  <SelectItem value="La Libertad Avanza">La Libertad Avanza</SelectItem>
                   <SelectItem value="Departamento Ejecutivo">Departamento Ejecutivo</SelectItem>
                   <SelectItem value="Comunicaciones oficiales">Comunicaciones oficiales</SelectItem>
                   <SelectItem value="Parlamento Estudiantil">Parlamento Estudiantil</SelectItem>
@@ -201,6 +238,50 @@ export default function IngresarProyectoPage() {
               />
             </div>
           )}
+
+          {/* Campo Autor dinámico */}
+          <div>
+            <label className="block text-sm font-semibold text-blue-900 mb-1">Autor *</label>
+            {isBloque(form.origen) ? (
+              // Si es un bloque, mostrar select de integrantes
+              <Select 
+                value={form.autor} 
+                onValueChange={(value) => setForm(prev => ({ ...prev, autor: value }))}
+                disabled={loadingMembers}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={loadingMembers ? "Cargando integrantes..." : "Seleccionar autor"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {blockMembers.map((member) => (
+                    <SelectItem key={member.id} value={member.name}>
+                      {member.name} {member.position && `- ${member.position}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : form.origen === "otros" ? (
+              // Si es "otros", permitir escribir el autor
+              <Input
+                name="autor"
+                value={form.autor}
+                onChange={handleChange}
+                placeholder="Ingrese el autor"
+              />
+            ) : (
+              // Para otros orígenes (Departamento Ejecutivo, Vecinos, etc.), mostrar el origen como autor
+              <Input
+                value={form.autor || form.origen}
+                readOnly
+                className="bg-gray-100"
+              />
+            )}
+            {isBloque(form.origen) && blockMembers.length === 0 && !loadingMembers && (
+              <div className="text-xs text-gray-500 mt-1">
+                No se encontraron integrantes para este bloque
+              </div>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
