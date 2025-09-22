@@ -47,7 +47,7 @@ async function getFilesInOrdenanzasRoot(): Promise<any[]> {
 // Extraer año del nombre del archivo
 function extractYearFromPublicId(publicId: string): number | null {
   const match = publicId.match(/ordenanza-(\d+)-(\d{4})/)
-  return match ? parseInt(match[2]) : null
+  return match && match[2] ? parseInt(match[2]) : null
 }
 
 // Mover archivo a la carpeta correcta

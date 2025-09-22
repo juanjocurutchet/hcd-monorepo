@@ -1,6 +1,6 @@
 import { db } from "@/lib/db-singleton"
 import { ordinances } from "@/lib/db/schema"
-import { eq, isNull, isNotNull, sql } from "drizzle-orm"
+import { eq, isNull, isNotNull, sql, and } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 import fs from 'fs'
 import path from 'path'
@@ -89,7 +89,7 @@ function findOrdinanceFile(baseDir: string, year: number, approvalNumber: number
   // Buscar archivo que coincida con el número de ordenanza
   const matchingFile = files.find(file => {
     const match = file.match(/Ordenanza\s+(\d+)/i)
-    return match && parseInt(match[1]) === approvalNumber
+    return match && match[1] && parseInt(match[1]) === approvalNumber
   })
 
   return matchingFile ? path.join(yearDir, matchingFile) : null
@@ -105,18 +105,23 @@ async function uploadOrdinanceFiles(
   const results: UploadResult[] = []
 
   // Consultar ordenanzas sin file_url o de un año específico
-  let query = db.select().from(ordinances)
+  const whereConditions = []
   
   if (year) {
-    query = query.where(eq(ordinances.year, year))
+    whereConditions.push(eq(ordinances.year, year))
   }
   
   if (skipExisting) {
     // Solo ordenanzas sin URL de archivo
-    query = query.where(isNull(ordinances.file_url))
+    whereConditions.push(isNull(ordinances.file_url))
   }
 
-  const ordinancesToProcess = await query.limit(limit).orderBy(ordinances.year, ordinances.approval_number)
+  const ordinancesToProcess = await db
+    .select()
+    .from(ordinances)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .limit(limit)
+    .orderBy(ordinances.year, ordinances.approval_number)
 
   console.log(`📁 Processing ${ordinancesToProcess.length} ordinances`)
 
@@ -192,15 +197,17 @@ export async function POST(request: NextRequest) {
 
     if (dryRun) {
       // Solo mostrar qué se subiría
-      let query = db.select().from(ordinances)
-        .where(isNull(ordinances.file_url))
-        .limit(limit)
+      const whereConditions = [isNull(ordinances.file_url)]
 
       if (year) {
-        query = query.where(eq(ordinances.year, parseInt(year)))
+        whereConditions.push(eq(ordinances.year, parseInt(year)))
       }
 
-      const toProcess = await query
+      const toProcess = await db
+        .select()
+        .from(ordinances)
+        .where(and(...whereConditions))
+        .limit(limit)
       
       return NextResponse.json({
         dryRun: true,

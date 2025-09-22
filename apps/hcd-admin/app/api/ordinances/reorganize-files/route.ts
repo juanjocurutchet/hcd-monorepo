@@ -41,7 +41,7 @@ function extractPublicIdFromUrl(url: string): string | null {
   // Extraer public_id de la URL de Cloudinary
   // Ejemplo: https://res.cloudinary.com/dpn8we0s3/raw/upload/v1758467450/ordenanzas/ordenanza-3659-2025.docx
   const match = url.match(/\/upload\/v\d+\/(.+?)(?:\.[^.]+)?$/)
-  return match ? match[1] : null
+  return match && match[1] ? match[1] : null
 }
 
 export async function GET(request: NextRequest) {
