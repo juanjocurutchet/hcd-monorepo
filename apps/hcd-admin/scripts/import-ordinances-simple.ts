@@ -50,8 +50,8 @@ function extractOrdinanceData(fileName: string, year: number): OrdinanceData | n
   const match = fileName.match(/Ordenanza\s+(\d+)\.?\s*(.+)/i)
   if (!match) return null
 
-  const approvalNumber = parseInt(match[1])
-  let title = match[2]
+  const approvalNumber = parseInt(match[1] || "0")
+  let title = match[2] || ""
     .replace(/\.(docx?|pdf|xlsx?)$/i, '')
     .replace(/^\s*[-.]?\s*/, '')
     .trim()

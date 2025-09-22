@@ -24,11 +24,12 @@ async function moveFileToNewStructure(fileUrl: string, origen: string, autor: st
     // Extraer el public_id del URL de Cloudinary
     const urlParts = fileUrl.split('/')
     const fileWithExtension = urlParts[urlParts.length - 1]
-    const fileName = fileWithExtension.split('.')[0]
+    const fileName = fileWithExtension ? fileWithExtension.split('.')[0] : 'unknown'
     
     // Encontrar el folder actual del archivo
     const uploadIndex = urlParts.indexOf('upload')
-    const versionIndex = urlParts.indexOf('v' + urlParts[uploadIndex + 1].substring(1))
+    const versionPart = urlParts[uploadIndex + 1]
+    const versionIndex = versionPart ? urlParts.indexOf('v' + versionPart.substring(1)) : -1
     const currentFolderParts = urlParts.slice(versionIndex + 1, -1)
     const currentPublicId = [...currentFolderParts, fileName].join('/')
 

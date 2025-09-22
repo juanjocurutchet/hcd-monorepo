@@ -76,7 +76,7 @@ function extractOrdinanceInfo(fileName: string, year: number): OrdinanceData | n
     return null
   }
 
-  const approvalNumber = parseInt(numberMatch[1])
+  const approvalNumber = parseInt(numberMatch[1] || "0")
   let title = numberMatch[2] || ""
 
   // Limpiar título
