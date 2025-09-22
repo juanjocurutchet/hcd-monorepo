@@ -42,7 +42,7 @@ const getCategory = (title: string): string => {
 
 function extractOrdinanceData(fileName: string, year: number): OrdinanceData | null {
   const match = fileName.match(/Ordenanza\s+(\d+)\.?\s*(.+)/i)
-  if (!match) return null
+  if (!match || !match[1] || !match[2]) return null
 
   const approvalNumber = parseInt(match[1])
   let title = match[2]

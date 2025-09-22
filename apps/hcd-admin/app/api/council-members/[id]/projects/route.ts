@@ -25,12 +25,14 @@ export async function GET(
       .where(eq(councilMembers.id, councilMemberId))
       .limit(1)
 
-    if (!councilMember.length) {
+    if (!councilMember.length || !councilMember[0]) {
       return NextResponse.json(
         { error: 'Concejal no encontrado' },
         { status: 404 }
       )
     }
+
+    const foundCouncilMember = councilMember[0]
 
     // Obtener proyectos presentados por este concejal
     const projects = await db
@@ -38,7 +40,7 @@ export async function GET(
       .from(sessionFiles)
       .where(
         and(
-          eq(sessionFiles.autor, councilMember[0].name),
+          eq(sessionFiles.autor, foundCouncilMember.name),
           sql`${sessionFiles.autor} IS NOT NULL`
         )
       )
@@ -56,7 +58,7 @@ export async function GET(
 
     const response = NextResponse.json({
       success: true,
-      councilMember: councilMember[0],
+      councilMember: foundCouncilMember,
       totalProjects: projects.length,
       projectsByYear,
       projects // También enviar lista completa para compatibilidad

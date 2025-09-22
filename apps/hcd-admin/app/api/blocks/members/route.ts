@@ -22,12 +22,14 @@ export async function GET(request: NextRequest) {
       .where(eq(politicalBlocks.name, blockName))
       .limit(1)
 
-    if (!block.length) {
+    if (!block.length || !block[0]) {
       return NextResponse.json(
         { error: 'Block not found' },
         { status: 404 }
       )
     }
+
+    const foundBlock = block[0]
 
     // Obtener los miembros del bloque
     const members = await db
@@ -38,12 +40,12 @@ export async function GET(request: NextRequest) {
         email: councilMembers.email
       })
       .from(councilMembers)
-      .where(eq(councilMembers.blockId, block[0].id))
+      .where(eq(councilMembers.blockId, foundBlock.id))
       .orderBy(councilMembers.name)
 
     return NextResponse.json({
       success: true,
-      block: block[0],
+      block: foundBlock,
       members
     })
 

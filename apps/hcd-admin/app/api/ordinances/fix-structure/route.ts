@@ -24,7 +24,7 @@ interface FixResult {
 // Extraer public_id desde la URL de Cloudinary
 function extractPublicIdFromUrl(url: string): string | null {
   const match = url.match(/\/upload\/v\d+\/(.+?)(?:\.[^.]+)?$/)
-  return match ? match[1] : null
+  return match ? (match[1] ?? null) : null
 }
 
 // Crear carpetas y mover archivos
@@ -100,21 +100,19 @@ export async function POST(request: NextRequest) {
     const { limit = 20, dryRun = false, year } = await request.json()
 
     // Obtener archivos que necesitan corrección
-    let query = db
-      .select()
-      .from(ordinances)
-      .where(
-        and(
-          isNotNull(ordinances.file_url),
-          gte(ordinances.year, 2023)
-        )
-      )
+    const whereConditions = [
+      isNotNull(ordinances.file_url),
+      gte(ordinances.year, 2023)
+    ]
 
     if (year) {
-      query = query.where(eq(ordinances.year, parseInt(year)))
+      whereConditions.push(eq(ordinances.year, parseInt(year)))
     }
 
-    const ordinancesToFix = await query
+    const ordinancesToFix = await db
+      .select()
+      .from(ordinances)
+      .where(and(...whereConditions))
       .orderBy(ordinances.year, ordinances.approval_number)
       .limit(limit)
 

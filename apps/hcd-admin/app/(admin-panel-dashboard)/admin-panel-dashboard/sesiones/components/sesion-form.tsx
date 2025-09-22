@@ -441,7 +441,8 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
       i === idx ? {
         ...p,
         origen: value,
-        prefijoOrigen: prefijo
+        prefijoOrigen: prefijo,
+        autor: "" // Limpiar el autor al cambiar origen
       } : p
     ))
     // Limpiar el campo personalizado si cambia el origen
@@ -451,6 +452,19 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
         delete newState[idx]
         return newState
       })
+    }
+
+    // Si es un bloque, cargar sus integrantes para la edición
+    if (isBloque(value)) {
+      loadBlockMembers(value)
+    } else {
+      // Si no es bloque, usar el propio origen como autor
+      setBlockMembers([])
+      if (value !== "otros") {
+        setEditProyectos(prev => prev.map((p, i) =>
+          i === idx ? { ...p, autor: value } : p
+        ))
+      }
     }
   }
 
@@ -920,6 +934,7 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                             <th className="px-3 py-2 border text-center w-[120px]">Fecha de ingreso</th>
                             <th className="px-3 py-2 border text-center w-[120px]">Expte</th>
                             <th className="px-3 py-2 border text-center w-[150px]">Origen</th>
+                            <th className="px-3 py-2 border text-center w-[150px]">Autor</th>
                             <th className="px-3 py-2 border text-center w-[150px]">Tipo</th>
                             <th className="px-3 py-2 border text-center w-2/4">Título</th>
                             <th className="px-3 py-2 border text-center w-[100px]">Archivo</th>
@@ -978,9 +993,9 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="Bloque Todos Por Las Flores">Bloque Todos Por Las Flores</SelectItem>
-                                        <SelectItem value="Bloque Adelante Juntos">Bloque Adelante Juntos</SelectItem>
-                                        <SelectItem value="Bloque La Libertad Avanza">Bloque La Libertad Avanza</SelectItem>
+                                        <SelectItem value="Todos por Las Flores">Todos por Las Flores</SelectItem>
+                                        <SelectItem value="Adelante Juntos ">Adelante Juntos </SelectItem>
+                                        <SelectItem value="La Libertad Avanza">La Libertad Avanza</SelectItem>
                                         <SelectItem value="Departamento Ejecutivo">Departamento Ejecutivo</SelectItem>
                                         <SelectItem value="Comunicaciones oficiales">Comunicaciones oficiales</SelectItem>
                                         <SelectItem value="Parlamento Estudiantil">Parlamento Estudiantil</SelectItem>
@@ -1000,6 +1015,50 @@ export function SesionForm({ sesion = null }: { sesion?: Sesion | null }) {
                                 ) : (
                                   <div className="text-xs font-medium">
                                     {p.origen === "otros" ? (editOrigenPersonalizado[idx] || p.origen) : p.origen}
+                                  </div>
+                                )}
+                              </td>
+                              {/* Autor */}
+                              <td className="border px-3 py-2 text-center align-middle">
+                                {editingProyecto === idx ? (
+                                  <div className="text-xs">
+                                    {isBloque(p.origen) ? (
+                                      <Select
+                                        value={p.autor || ""}
+                                        onValueChange={(value) => handleEditProyectoChange(idx, "autor", value)}
+                                        disabled={loadingMembers}
+                                      >
+                                        <SelectTrigger className="text-xs h-8">
+                                          <SelectValue placeholder={loadingMembers ? "Cargando..." : "Seleccionar"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {blockMembers.map((member) => (
+                                            <SelectItem key={member.id} value={member.name}>
+                                              {member.name}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    ) : p.origen === "otros" ? (
+                                      <Input
+                                        value={p.autor || ""}
+                                        onChange={e => handleEditProyectoChange(idx, "autor", e.target.value)}
+                                        placeholder="Autor"
+                                        className="text-xs h-8"
+                                      />
+                                    ) : (
+                                      <Input
+                                        value={p.autor || ""}
+                                        onChange={e => handleEditProyectoChange(idx, "autor", e.target.value)}
+                                        placeholder="Autor"
+                                        className="text-xs h-8 bg-gray-100"
+                                        readOnly
+                                      />
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-xs font-medium">
+                                    {p.autor || "Sin autor"}
                                   </div>
                                 )}
                               </td>
