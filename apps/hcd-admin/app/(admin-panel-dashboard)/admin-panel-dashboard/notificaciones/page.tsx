@@ -51,7 +51,7 @@ export default function NotificationsTestPage() {
     }
   };
 
-  const testEmail = async () => {
+  const sendTestEmail = async () => {
     if (!testEmail) {
       setMessage("❌ Ingresa un email de prueba");
       return;
@@ -202,7 +202,7 @@ export default function NotificationsTestPage() {
             className="flex-1"
           />
           <Button 
-            onClick={testEmail} 
+            onClick={sendTestEmail} 
             disabled={loading || !smtpStatus?.configured}
             className="bg-blue-600 hover:bg-blue-700"
           >
