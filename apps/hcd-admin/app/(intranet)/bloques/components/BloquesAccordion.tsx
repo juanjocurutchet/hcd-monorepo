@@ -205,13 +205,17 @@ export default function BloquesAccordion({ bloques }: { bloques: Bloque[] }) {
                               
                               {Object.keys(projects.projectsByYear)
                                 .sort((a, b) => parseInt(b) - parseInt(a))
-                                .map(year => (
-                                  <div key={year} className="mb-6">
-                                    <h5 className="font-medium text-gray-700 mb-2 border-b pb-1">
-                                      Año {year} ({projects.projectsByYear[parseInt(year)].length} proyectos)
-                                    </h5>
-                                    <div className="space-y-2">
-                                      {projects.projectsByYear[parseInt(year)].map(project => (
+                                .map(year => {
+                                  const yearProjects = projects.projectsByYear[parseInt(year)]
+                                  if (!yearProjects) return null
+                                  
+                                  return (
+                                    <div key={year} className="mb-6">
+                                      <h5 className="font-medium text-gray-700 mb-2 border-b pb-1">
+                                        Año {year} ({yearProjects.length} proyectos)
+                                      </h5>
+                                      <div className="space-y-2">
+                                        {yearProjects.map(project => (
                                         <div key={project.id} className="bg-gray-50 rounded p-3 border">
                                           <div className="flex justify-between items-start gap-3">
                                             <div className="flex-1">
@@ -261,10 +265,11 @@ export default function BloquesAccordion({ bloques }: { bloques: Bloque[] }) {
                                             </div>
                                           </div>
                                         </div>
-                                      ))}
+                                        ))}
+                                      </div>
                                     </div>
-                                  </div>
-                                ))
+                                  )
+                                })
                               }
                             </div>
                           ) : (
